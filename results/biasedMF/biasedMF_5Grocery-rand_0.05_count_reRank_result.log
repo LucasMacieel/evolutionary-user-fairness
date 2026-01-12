@@ -1,0 +1,11 @@
+Model:biasedMF | Dataset:dataset\5Grocery-rand | Group:0.05_count |  Epsilon=None | K=10 | Fairness_metric=f1
+Before optimization overall scores           : ndcg@10=0.4508 f1@10=0.1578 
+Before optimization group 1 (active) scores  : ndcg@10=0.7029 f1@10=0.3648 
+Before optimization group 2 (inactive) scores: ndcg@10=0.4274 f1@10=0.1386 
+Dynamic epsilon: original_gap=0.2262, epsilon=0.1131
+After optimization overall metric scores     : ndcg@10=0.4580 f1@10=0.1607 
+After optimization group 1 (active) scores   : ndcg@10=0.6303 f1@10=0.2643 
+After optimization group 2 (inactive) scores : ndcg@10=0.4420 f1@10=0.1511 
+
+
+

@@ -18,14 +18,19 @@ For inquiries contact Yunqi Li (yunqi.li@rutgers.edu) or Hanxiong Chen (hanxiong
 
 ## Environments
 
-Python 3.6.6
+Python 3.6.6+
 
 Packages:
 ```
-pandas==0.24.2
-Gurobi==9.0.2
+pandas>=0.24.2
+pulp>=2.7.0
 ```
-[Gurobi](https://www.gurobi.com/) is a commercial optimization solver. To run our code, please first install Gurobi and purchase a license. Without a license or fail to install properly, our code will not be able to run.
+[PuLP](https://coin-or.github.io/pulp/) is a free, open-source linear programming library that uses the CBC (COIN-OR Branch and Cut) solver by default. No commercial license required.
+
+Install dependencies:
+```bash
+pip install pandas pulp
+```
 
 ## Datasets
 

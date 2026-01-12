@@ -1,0 +1,11 @@
+Model:NCF | Dataset:dataset\5Health-rand | Group:max_0.05 |  Epsilon=None | K=10 | Fairness_metric=f1
+Before optimization overall scores           : ndcg@10=0.3355 f1@10=0.1220 
+Before optimization group 1 (active) scores  : ndcg@10=0.4651 f1@10=0.2112 
+Before optimization group 2 (inactive) scores: ndcg@10=0.3274 f1@10=0.1165 
+Dynamic epsilon: original_gap=0.0948, epsilon=0.0474
+After optimization overall metric scores     : ndcg@10=0.3365 f1@10=0.1233 
+After optimization group 1 (active) scores   : ndcg@10=0.4064 f1@10=0.1679 
+After optimization group 2 (inactive) scores : ndcg@10=0.3322 f1@10=0.1205 
+
+
+
