@@ -223,7 +223,7 @@ class UGF(object):
 
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
         if self._epsilon_input == "auto":
-            self.epsilon = original_ugf / 2  # Half of original UGF gap
+            self.epsilon = original_ugf / 4  # One quarter of original UGF gap
             print(f"\nDynamic epsilon calculation (paper methodology):")
             print(
                 f"  Original UGF gap ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
@@ -252,9 +252,9 @@ class UGF(object):
         # Optimize model with timing
         import time
 
-        print("Solving optimization problem with PuLP (CBC solver)...")
+        print("Solving optimization problem with PuLP (HiGHS solver)...")
         start_time = time.time()
-        prob.solve(pulp.PULP_CBC_CMD(msg=1))
+        prob.solve(pulp.HiGHS_CMD(msg=1))
         end_time = time.time()
         cpu_time = end_time - start_time
 

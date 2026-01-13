@@ -3,13 +3,13 @@ Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306 
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213 
 Before optimization UGF (f1@10): 0.2093 (20.93%)
-Dynamic epsilon: original_gap=0.2093, epsilon=0.1046
+Dynamic epsilon: original_gap=0.2093, epsilon=0.0523
 Solver status: Optimal
-CPU time: 545.53 seconds
-After optimization overall metric scores     : ndcg@10=0.4216 f1@10=0.1433 
-After optimization group 1 (active) scores   : ndcg@10=0.5872 f1@10=0.2390 
-After optimization group 2 (inactive) scores : ndcg@10=0.4061 f1@10=0.1344 
-After optimization UGF (f1@10): 0.1046 (10.46%)
-UGF reduction: 0.1046 (50.0% improvement)
+CPU time: 263.73 seconds
+After optimization overall metric scores     : ndcg@10=0.4232 f1@10=0.1455 
+After optimization group 1 (active) scores   : ndcg@10=0.5237 f1@10=0.1933 
+After optimization group 2 (inactive) scores : ndcg@10=0.4138 f1@10=0.1410 
+After optimization UGF (f1@10): 0.0523 (5.23%)
+UGF reduction: 0.1569 (75.0% improvement)
 
 
