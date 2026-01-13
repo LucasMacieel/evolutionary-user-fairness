@@ -126,23 +126,26 @@ class GAOptimizer:
         print(f"Vectorized data: {self.n_users} users, {self.n_items} items per user")
         print(f"Group 1: {self.n_g1} users, Group 2: {self.n_g2} users")
 
-    def _calculate_fitness_batch(self, population: np.ndarray, current_epsilon: float) -> np.ndarray:
+    def _calculate_fitness_batch(self, population: np.ndarray, current_epsilon: float) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Calculate fitness for entire population using vectorized operations.
+        Calculate objective (quality) and constraint violation for population.
         
         Args:
             population: shape (pop_size, n_users, n_items) binary selection matrices
             current_epsilon: current fairness constraint threshold
             
         Returns:
-            fitnesses: shape (pop_size,)
+            objectives: shape (pop_size,) - The objective function value (sum of scores)
+            violations: shape (pop_size,) - The constraint violation (max(0, ugf - epsilon))
         """
         pop_size = population.shape[0]
         
-        # Score sum: sum of (selection * score) over all users and items
+        # 1. Objective: Sum of preference scores
         # population: (pop_size, n_users, n_items)
         # scores_matrix: (n_users, n_items)
-        score_sums = (population * self.scores_matrix).sum(axis=(1, 2))  # (pop_size,)
+        objectives = (population * self.scores_matrix).sum(axis=(1, 2))  # (pop_size,)
+        
+        # 2. Constraint: Fairness (UGF <= epsilon)
         
         # Calculate selected labels per user per individual
         selected_labels = population * self.labels_matrix  # (pop_size, n_users, n_items)
@@ -166,30 +169,16 @@ class GAOptimizer:
         
         ugf_gaps = np.abs(g1_avg - g2_avg)  # (pop_size,)
         
-        if self.original_ugf is None or self.original_ugf <= current_epsilon:
-            # No penalty scaling needed
-            fitnesses = score_sums
-        else:
-            # Stiffness-based penalty
-            # Strong penalty: fitness drops rapidy as UGF exceeds epsilon
-            stiffness = 50.0
-            
-            # Calculate violation ratio relative to epsilon
-            # If ugf = 1.1 * epsilon, ratio = 0.1
-            # penalty_factor = 1 - (ratio * stiffness)
-            # If ratio * stiffness > 1, fitness becomes negative
-            
-            violation = np.maximum(0, ugf_gaps - current_epsilon)
-            # Avoid division by zero
-            denom = current_epsilon if current_epsilon > 1e-6 else 1e-6
-            ratio = violation / denom
-            
-            scale = 1.0 - (ratio * stiffness)
-            
-            # Allow negative fitness to severely punish violation
-            fitnesses = score_sums * scale
+        # Calculate violation
+        # Violation = max(0, ugf - epsilon)
+        # We normalize violation by epsilon to keep it roughly scale-independent, but raw works too.
+        # Here we use raw deviation.
+        violations = np.maximum(0, ugf_gaps - current_epsilon)
         
-        return fitnesses, ugf_gaps
+        # Calculate signed UGF (G1 - G2) to know direction of violation
+        signed_ugf = g1_avg - g2_avg
+
+        return objectives, violations, ugf_gaps, signed_ugf
 
     def _create_initial_population(self, size: int) -> np.ndarray:
         """
@@ -262,15 +251,15 @@ class GAOptimizer:
         
         return children1, children2
 
-    def _mutate_batch(self, population: np.ndarray) -> np.ndarray:
+    def _mutate_batch(self, population: np.ndarray, bias_dir: float = 0.0) -> np.ndarray:
         """
-        Smart Swap Mutation:
-        - Prefer adding high-scoring items (guided exploration)
-        - Prefer removing low-scoring items
-        - Maintains K items constraint
+        Smart Swap Mutation with Repair Bias.
         
-        This biases the search towards high-quality solutions, helping the GA
-        recover from the destructive effects of random initialization.
+        Args:
+            population: Batch of individuals
+            bias_dir: Global bias direction (G1_avg - G2_avg).
+                      positive -> G1 advantage (Need to suppress G1 / boost G2)
+                      negative -> G2 advantage (Need to suppress G2 / boost G1)
         """
         pop_size = population.shape[0]
         mutated = population.copy()
@@ -278,34 +267,70 @@ class GAOptimizer:
         # Decide which users to mutate for each individual
         mutate_mask = np.random.random((pop_size, self.n_users)) < self.mutation_rate
         
-        # This loop is unavoidable for variable-index manipulation, 
-        # but operation inside is fast
+        # Repair logic thresholds
+        apply_repair = abs(bias_dir) > (self.epsilon if self.epsilon else 0.05)
+        # If bias is positive (G1 > G2), we want to lower G1 (Suppress) and raise G2 (Boost)
+        # If bias is negative (G2 > G1), we want to lower G2 (Suppress) and raise G1 (Boost)
+
+        # Pre-compute scores for fast access (though numpy indexing is fast enough)
+        
         for i in range(pop_size):
             for u in range(self.n_users):
                 if mutate_mask[i, u]:
-                    # Get indices
                     selected = np.where(mutated[i, u] == 1)[0]
                     unselected = np.where(mutated[i, u] == 0)[0]
                     
                     if len(selected) > 0 and len(unselected) > 0:
-                        # BALANCED MUTATION STRATEGY
-                        # 50% Smart Swap (Exploit): Improve score
-                        # 50% Random Swap (Explore): Allow quality drop for fairness
                         
-                        if np.random.random() < 0.5:
-                            # --- Smart Swap (Greedy) ---
-                            # Remove Worst Selected
+                        # Determine strategy for this user
+                        strategy = "random"
+                        if apply_repair:
+                            is_g1 = self.g1_mask[u]
+                            is_g2 = self.g2_mask[u]
+                            
+                            # Logic: 
+                            # If G1 > G2 (bias > 0):
+                            #   - G1 user: Suppress (Sacrifice quality)
+                            #   - G2 user: Boost (Improve quality)
+                            # If G2 > G1 (bias < 0):
+                            #   - G1 user: Boost
+                            #   - G2 user: Suppress
+                            
+                            if bias_dir > 0:
+                                if is_g1: strategy = "suppress"
+                                elif is_g2: strategy = "boost"
+                            else:
+                                if is_g1: strategy = "boost"
+                                elif is_g2: strategy = "suppress"
+                        
+                        # Fallback for balanced/random if not repairing or neutral group
+                        if strategy == "random" and np.random.random() < 0.5:
+                            strategy = "boost" # Default Smart Swap is a boost
+
+                        if strategy == "boost":
+                            # --- Boost (Greedy) ---
+                            # Remove Worst Selected -> Add Best Unselected
                             cand_remove = np.random.choice(selected, size=min(3, len(selected)), replace=False)
                             scores_remove = self.scores_matrix[u, cand_remove]
                             to_remove = cand_remove[np.argmin(scores_remove)]
                             
-                            # Add Best Unselected
                             cand_add = np.random.choice(unselected, size=min(5, len(unselected)), replace=False)
                             scores_add = self.scores_matrix[u, cand_add]
                             to_add = cand_add[np.argmax(scores_add)]
+                            
+                        elif strategy == "suppress":
+                             # --- Suppress (Altruistic) ---
+                             # Remove Best Selected -> Add Worst Unselected
+                             # (Sacrifice own score to lower group average)
+                            cand_remove = np.random.choice(selected, size=min(3, len(selected)), replace=False)
+                            scores_remove = self.scores_matrix[u, cand_remove]
+                            to_remove = cand_remove[np.argmax(scores_remove)] # Remove BEST
+                            
+                            cand_add = np.random.choice(unselected, size=min(5, len(unselected)), replace=False)
+                            scores_add = self.scores_matrix[u, cand_add]
+                            to_add = cand_add[np.argmin(scores_add)] # Add WORST
                         else:
-                            # --- Random Swap (Exploration) ---
-                            # Necessary to allow sacrificing quality for fairness
+                            # --- Random Swap ---
                             to_remove = np.random.choice(selected)
                             to_add = np.random.choice(unselected)
                         
@@ -315,16 +340,70 @@ class GAOptimizer:
                         
         return mutated
 
-    def _tournament_selection(self, population: np.ndarray, fitnesses: np.ndarray, 
-                              n_select: int, tournament_size: int = 5) -> np.ndarray:
-        """Tournament selection for multiple individuals."""
+    def _tournament_selection(self, population: np.ndarray, objectives: np.ndarray, 
+                              violations: np.ndarray, n_select: int, tournament_size: int = 5) -> np.ndarray:
+        """
+        Tournament selection using Deb's Feasibility Rules.
+        
+        Rules for comparing two solutions A and B:
+        1. If A is feasible and B is infeasible, A wins.
+        2. If A and B are both feasible, the one with better objective wins.
+        3. If A and B are both infeasible, the one with lower constraint violation wins.
+        """
         pop_size = population.shape[0]
         selected = np.zeros((n_select, self.n_users, self.n_items), dtype=np.int8)
         
+        # Vectorized tournament
+        # We perform 'n_select' tournaments independently
+        
         for i in range(n_select):
-            candidates = np.random.choice(pop_size, size=tournament_size, replace=False)
-            winner = candidates[np.argmax(fitnesses[candidates])]
-            selected[i] = population[winner]
+            # Select random candidates
+            candidates_idx = np.random.choice(pop_size, size=tournament_size, replace=False)
+            
+            # Extract their metrics
+            cand_obj = objectives[candidates_idx]
+            cand_viol = violations[candidates_idx]
+            
+            # Determine best candidate using Deb's rules
+            # We'll find the best index within the candidates array
+            best_local_idx = 0
+            
+            for j in range(1, tournament_size):
+                # Compare current best (A) with candidate (B)
+                curr_idx = best_local_idx
+                challenger_idx = j
+                
+                # Metrics for A
+                obj_A = cand_obj[curr_idx]
+                viol_A = cand_viol[curr_idx]
+                is_feas_A = (viol_A <= 1e-9) # Treat effectively 0 as feasible to handle float precision
+                
+                # Metrics for B
+                obj_B = cand_obj[challenger_idx]
+                viol_B = cand_viol[challenger_idx]
+                is_feas_B = (viol_B <= 1e-9)
+                
+                # Apply Rules
+                scaler = 1.0 # Maximization
+                
+                if is_feas_A and is_feas_B:
+                    # Both feasible: better objective wins
+                    if obj_B > obj_A:
+                        best_local_idx = challenger_idx
+                elif is_feas_A and not is_feas_B:
+                    # A feasible, B infeasible: A stays
+                    pass
+                elif not is_feas_A and is_feas_B:
+                    # A infeasible, B feasible: B wins
+                    best_local_idx = challenger_idx
+                else:
+                    # Both infeasible: lower violation wins
+                    if viol_B < viol_A:
+                        best_local_idx = challenger_idx
+            
+            # Retrieve winner info
+            winner_global_idx = candidates_idx[best_local_idx]
+            selected[i] = population[winner_global_idx]
             
         return selected
 
@@ -394,7 +473,7 @@ class GAOptimizer:
 
         # Calculate original UGF using batch method with single individual
         baseline_pop = baseline_solution[np.newaxis, :, :]  # Add batch dimension
-        _, ugf_gaps = self._calculate_fitness_batch(baseline_pop, current_epsilon=1.0)
+        _, _, ugf_gaps, _ = self._calculate_fitness_batch(baseline_pop, current_epsilon=1.0)
         self.original_ugf = ugf_gaps[0]
         
         print(f"  UGF gap: {self.original_ugf:.4f} ({self.original_ugf * 100:.2f}%)")
@@ -424,14 +503,24 @@ class GAOptimizer:
         # Start slightly tighter than original to force immediate movement
         start_epsilon = self.original_ugf * 0.99
         target_epsilon = self.epsilon
-        fitnesses, ugf_gaps = self._calculate_fitness_batch(population, start_epsilon)
+        # Initial evaluation
+        # Start slightly tighter than original to force immediate movement
+        start_epsilon = self.original_ugf * 0.99
+        target_epsilon = self.epsilon
+        objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(population, start_epsilon)
 
-        best_idx = np.argmax(fitnesses)
-        best_fitness = fitnesses[best_idx]
+        def get_best_idx(objs, viols):
+            keys = (-objs, viols)
+            indices = np.lexsort((-objs, viols))
+            return indices[0]
+
+        best_idx = get_best_idx(objectives, violations)
+        best_fitness = objectives[best_idx]
         best_solution = population[best_idx].copy()
         best_ugf = ugf_gaps[best_idx]
+        best_viol = violations[best_idx]
 
-        print(f"\nInitial population: best_fitness={best_fitness:.2f}, UGF={best_ugf:.4f}")
+        print(f"\nInitial population: best_obj={best_fitness:.2f}, best_viol={best_viol:.4f}, UGF={best_ugf:.4f}")
 
         # Track best feasible solution
         best_feasible_solution = None
@@ -444,66 +533,77 @@ class GAOptimizer:
             current_epsilon = start_epsilon + (target_epsilon - start_epsilon) * progress
 
             # Elitism: keep top individuals
-            elite_indices = np.argsort(fitnesses)[-self.elitism_count:]
+            # Use same Deb's sort logic
+            sorted_indices = np.lexsort((-objectives, violations))
+            elite_indices = sorted_indices[:self.elitism_count]
             elites = population[elite_indices].copy()
 
             # Selection
             n_offspring = self.population_size - self.elitism_count
             n_pairs = (n_offspring + 1) // 2
             
-            parents1 = self._tournament_selection(population, fitnesses, n_pairs)
-            parents2 = self._tournament_selection(population, fitnesses, n_pairs)
+            parents1 = self._tournament_selection(population, objectives, violations, n_pairs)
+            parents2 = self._tournament_selection(population, objectives, violations, n_pairs)
 
             # Crossover
             children1, children2 = self._crossover_batch(parents1, parents2)
             offspring = np.concatenate([children1, children2], axis=0)[:n_offspring]
 
             # Mutation
-            offspring = self._mutate_batch(offspring)
+            # Determine current bias direction from population average
+            # (Use previous generation's evaluation to guide mutation)
+            # A positive mean means G1 is generally advantaged -> Suppress G1, Boost G2
+            avg_bias = np.mean(signed_ugf)
+            
+            # Mutation with Repair Bias
+            offspring = self._mutate_batch(offspring, bias_dir=avg_bias)
 
             # New population
             population = np.concatenate([elites, offspring], axis=0)
 
             # Evaluate
-            fitnesses, ugf_gaps = self._calculate_fitness_batch(population, current_epsilon)
+            objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(population, current_epsilon)
 
             # Track best
-            gen_best_idx = np.argmax(fitnesses)
-            gen_best_fitness = fitnesses[gen_best_idx]
+            gen_best_idx = get_best_idx(objectives, violations)
+            gen_best_fitness = objectives[gen_best_idx]
             gen_best_ugf = ugf_gaps[gen_best_idx]
+            gen_best_viol = violations[gen_best_idx]
 
             if gen_best_fitness > best_fitness:
-                best_fitness = gen_best_fitness
-                best_solution = population[gen_best_idx].copy()
-                best_ugf = gen_best_ugf
+                 best_solution = population[gen_best_idx].copy()
+                 best_fitness = gen_best_fitness
+                 best_ugf = gen_best_ugf
 
-            # Track best feasible (at target epsilon)
-            feasible_mask = ugf_gaps <= target_epsilon
+            target_violations = np.maximum(0, ugf_gaps - target_epsilon)
+            feasible_mask = target_violations <= 1e-6
+            
             if feasible_mask.any():
-                feasible_fitnesses = np.where(feasible_mask, fitnesses, float('-inf'))
-                best_feasible_idx = np.argmax(feasible_fitnesses)
-                if fitnesses[best_feasible_idx] > best_feasible_fitness:
-                    best_feasible_fitness = fitnesses[best_feasible_idx]
-                    best_feasible_solution = population[best_feasible_idx].copy()
+                feasible_objs = objectives.copy()
+                feasible_objs[~feasible_mask] = float('-inf')
+                current_best_feasible_idx = np.argmax(feasible_objs)
+                
+                if feasible_objs[current_best_feasible_idx] > best_feasible_fitness:
+                    best_feasible_fitness = feasible_objs[current_best_feasible_idx]
+                    best_feasible_solution = population[current_best_feasible_idx].copy()
 
             # Progress logging
-            print(f"  Gen {gen + 1}: eps={current_epsilon:.4f}, fitness={gen_best_fitness:.2f}, "
-                  f"UGF={gen_best_ugf:.4f}")
+            if gen % 10 == 0 or gen == self.generations - 1:
+                print(f"  Gen {gen + 1}: eps={current_epsilon:.4f}, best_obj={gen_best_fitness:.2f}, "
+                      f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}")
 
         cpu_time = time.time() - start_time
         print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
         self.logger.info(f"CPU time: {cpu_time:.2f} seconds")
 
-        # Use feasible solution if available
+        # Use feasible solution if available (Priority 1)
         if best_feasible_solution is not None:
             final_solution = best_feasible_solution
             print("Using best FEASIBLE solution (constraint satisfied)")
         else:
-            # If no feasible solution, use the best from the LAST generation
-            # (Do not use historical best_solution as it comes from Gen 0 with loose constraints)
-            last_gen_best_idx = np.argmax(fitnesses)
-            final_solution = population[last_gen_best_idx].copy()
-            print("Using best solution from FINAL generation (constraint violated)")
+            # If no feasible solution found, use the best available (min violation)
+            print("Using best solution from FINAL generation (constraint violated, minimization violation)")
+            final_solution = best_solution
 
         # Final results with group breakdown
         print("\n" + "=" * 70)
@@ -527,7 +627,7 @@ class GAOptimizer:
 
         # Final UGF
         final_pop = final_solution[np.newaxis, :, :]
-        _, final_ugf_arr = self._calculate_fitness_batch(final_pop, target_epsilon)
+        _, _, final_ugf_arr, _ = self._calculate_fitness_batch(final_pop, target_epsilon)
         final_ugf = final_ugf_arr[0]
         
         print(f"  Final UGF gap: {final_ugf:.4f} ({final_ugf * 100:.2f}%)")

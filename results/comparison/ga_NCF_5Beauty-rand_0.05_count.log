@@ -5,7 +5,7 @@ Before optimization group 1 (active) scores  : ndcg@10=0.6176 f1@10=0.2910
 Before optimization group 2 (inactive) scores: ndcg@10=0.3269 f1@10=0.1091
 Before optimization UGF (f1@10): 0.1819 (18.19%)
 Epsilon: 0.0455
-CPU time: 265.63 seconds
+CPU time: 356.33 seconds
 After optimization overall metric scores     : ndcg@10=0.2774 f1@10=0.0823
 After optimization group 1 (active) scores   : ndcg@10=0.4258 f1@10=0.1302
 After optimization group 2 (inactive) scores : ndcg@10=0.2649 f1@10=0.0788

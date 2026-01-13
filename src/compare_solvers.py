@@ -214,20 +214,92 @@ def run_comparison(
     print(f"Comparison log: {log_file}")
 
 
+    return {
+        "Dataset": dataset_name,
+        "Model": model_name,
+        "Group": group_name,
+        "MILP_Time": milp_time,
+        "MILP_UGF": milp_results['final_ugf'] if milp_results else None,
+        "MILP_NDCG": milp_results['final_metrics'][0] if milp_results else None,
+        "MILP_F1": milp_results['final_metrics'][1] if milp_results else None,
+        "GA_Time": ga_time,
+        "GA_UGF": ga_results['final_ugf'],
+        "GA_NDCG": ga_results['final_metrics'][0],
+        "GA_F1": ga_results['final_metrics'][1],
+        "GA_Satisfied": ga_results["constraint_satisfied"]
+    }
+
+
 if __name__ == "__main__":
-    # Default configuration
-    dataset_name = "5Beauty-rand"
-    model_name = "NCF"
-    group_name = "0.05_count"
-
-    # Parse command line arguments if provided
+    # Configuration
+    DATASETS = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
+    MODELS = ["NCF", "biasedMF"]
+    GROUPS = ["0.05_count", "sum_0.05", "max_0.05"]
+    
+    # Check for command line args (single run mode)
     if len(sys.argv) >= 4:
-        dataset_name = sys.argv[1]
-        model_name = sys.argv[2]
-        group_name = sys.argv[3]
-
-    run_comparison(
-        dataset_name=dataset_name,
-        model_name=model_name,
-        group_name=group_name,
-    )
+        # Run single
+        run_comparison(
+            dataset_name=sys.argv[1],
+            model_name=sys.argv[2],
+            group_name=sys.argv[3],
+        )
+    else:
+        # Run batch over all combinations
+        total_runs = len(DATASETS) * len(MODELS) * len(GROUPS)
+        print("\n" + "="*80)
+        print(f"Running Full Benchmark: {total_runs} experiments")
+        print(f"Datasets: {DATASETS}")
+        print(f"Models:   {MODELS}")
+        print(f"Groups:   {GROUPS}")
+        print("="*80 + "\n")
+        
+        all_results = []
+        run_count = 0
+        
+        for dataset in DATASETS:
+            for model in MODELS:
+                for group in GROUPS:
+                    run_count += 1
+                    print(f"\nProcessing [{run_count}/{total_runs}]: {dataset} | {model} | {group}...")
+                    try:
+                        res = run_comparison(
+                            dataset_name=dataset,
+                            model_name=model,
+                            group_name=group
+                        )
+                        all_results.append(res)
+                    except Exception as e:
+                        print(f"Error processing {dataset}|{model}|{group}: {e}")
+                        # Append error result to keep track
+                        all_results.append({
+                            "Dataset": dataset, "Model": model, "Group": group,
+                            "MILP_Time": 0, "GA_Time": 0,
+                            "GA_Satisfied": f"Error: {str(e)}"
+                        })
+                
+        # Create Master Summary
+        if all_results:
+            df_master = pd.DataFrame(all_results)
+            
+            # Reorder columns (ensure validation even if some columns missing due to errors)
+            cols = ["Dataset", "Model", "Group", 
+                    "MILP_Time", "GA_Time", 
+                    "MILP_UGF", "GA_UGF", 
+                    "MILP_NDCG", "GA_NDCG", 
+                    "GA_Satisfied"]
+            
+            # Filter columns that actually exist in the dataframe
+            final_cols = [c for c in cols if c in df_master.columns]
+            df_master = df_master[final_cols]
+            
+            print("\n" + "="*80)
+            print("MASTER COMPARISON SUMMARY")
+            print("="*80)
+            print(df_master.to_string(index=False))
+            
+            # Save to CSV
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_path = f"../results/comparison/master_summary_{timestamp}.csv"
+            df_master.to_csv(save_path, index=False)
+            print(f"\nMaster summary saved to: {save_path}")

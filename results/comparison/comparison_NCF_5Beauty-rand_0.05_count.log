@@ -2,17 +2,17 @@ Comparison: 5Beauty-rand | NCF | 0.05_count
 ========================================
 MILP Optimizer
 ========================================
-MILP CPU time: 147.64s
+MILP CPU time: 139.61s
 ========================================
 GA Optimizer
 ========================================
-GA CPU time: 355.53s
+GA CPU time: 450.43s
 
 Comparison Summary:
               Metric   MILP     GA
-        CPU Time (s) 147.64 355.53
+        CPU Time (s) 139.61 450.43
            Final UGF 0.0455 0.0452
    NDCG@10 (Overall) 0.3629 0.2774
      F1@10 (Overall) 0.1380 0.0823
 Constraint Satisfied     No    Yes
-Speedup: 0.42x
+Speedup: 0.31x
