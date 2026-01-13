@@ -38,7 +38,7 @@ class GAOptimizer:
         # GA parameters
         population_size: int = 100,
         generations: int = 200,
-        mutation_rate: float = 0.3,
+        mutation_rate: float = 0.1,
         crossover_rate: float = 0.8,
         elitism_count: int = 5,
         penalty_lambda: float = None,
@@ -166,29 +166,66 @@ class GAOptimizer:
         
         ugf_gaps = np.abs(g1_avg - g2_avg)  # (pop_size,)
         
-        # Calculate fitness with multiplicative penalty
-        # Handle case when original_ugf is not yet calculated (during baseline evaluation)
         if self.original_ugf is None or self.original_ugf <= current_epsilon:
-            # No penalty scaling needed - just return score sums
+            # No penalty scaling needed
             fitnesses = score_sums
         else:
-            fitnesses = np.where(
-                ugf_gaps <= current_epsilon,
-                score_sums,  # Feasible: full score
-                score_sums * np.maximum(0, 1 - (ugf_gaps - current_epsilon) / (self.original_ugf - current_epsilon + 0.01))
-            )
+            # Stiffness-based penalty
+            # Strong penalty: fitness drops rapidy as UGF exceeds epsilon
+            stiffness = 50.0
+            
+            # Calculate violation ratio relative to epsilon
+            # If ugf = 1.1 * epsilon, ratio = 0.1
+            # penalty_factor = 1 - (ratio * stiffness)
+            # If ratio * stiffness > 1, fitness becomes negative
+            
+            violation = np.maximum(0, ugf_gaps - current_epsilon)
+            # Avoid division by zero
+            denom = current_epsilon if current_epsilon > 1e-6 else 1e-6
+            ratio = violation / denom
+            
+            scale = 1.0 - (ratio * stiffness)
+            
+            # Allow negative fitness to severely punish violation
+            fitnesses = score_sums * scale
         
         return fitnesses, ugf_gaps
 
-    def _create_random_population(self, size: int) -> np.ndarray:
-        """Create random population with exactly K items selected per user."""
+    def _create_initial_population(self, size: int) -> np.ndarray:
+        """
+        Create initial population as 'Perturbed Greedy'.
+        Instead of starting from zero quality (random), we start near the 
+        greedy baseline (high quality) and explore the neighborhood.
+        """
         population = np.zeros((size, self.n_users, self.n_items), dtype=np.int8)
         
+        # Start with greedy selection for everyone
+        greedy_base = self._create_greedy_individual()
+        
+        # Apply random perturbations (simulated annealing style start)
+        # We use the mutation logic to perturb
         for i in range(size):
+            population[i] = greedy_base.copy()
+            
+        # Perturb the population (except the first one which stays pure greedy)
+        # We apply mutations to diversify the population
+        # Use a slightly higher rate for initialization diversity
+        init_mutation_rate = 0.2
+        mutate_mask = np.random.random((size, self.n_users)) < init_mutation_rate
+        
+        for i in range(1, size):  # Skip index 0 to keep one pure greedy
             for u in range(self.n_users):
-                selected = np.random.choice(self.n_items, size=self.k, replace=False)
-                population[i, u, selected] = 1
-                
+                if mutate_mask[i, u]:
+                    selected = np.where(population[i, u] == 1)[0]
+                    unselected = np.where(population[i, u] == 0)[0]
+                    
+                    if len(selected) > 0 and len(unselected) > 0:
+                        # Random swap for initialization (unbiased exploration)
+                        to_remove = np.random.choice(selected)
+                        to_add = np.random.choice(unselected)
+                        population[i, u, to_remove] = 0
+                        population[i, u, to_add] = 1
+                        
         return population
 
     def _create_greedy_individual(self) -> np.ndarray:
@@ -227,13 +264,13 @@ class GAOptimizer:
 
     def _mutate_batch(self, population: np.ndarray) -> np.ndarray:
         """
-        Swap mutation: for each user, swap one selected and one unselected item.
+        Smart Swap Mutation:
+        - Prefer adding high-scoring items (guided exploration)
+        - Prefer removing low-scoring items
+        - Maintains K items constraint
         
-        Args:
-            population: shape (pop_size, n_users, n_items)
-            
-        Returns:
-            mutated: same shape
+        This biases the search towards high-quality solutions, helping the GA
+        recover from the destructive effects of random initialization.
         """
         pop_size = population.shape[0]
         mutated = population.copy()
@@ -241,15 +278,38 @@ class GAOptimizer:
         # Decide which users to mutate for each individual
         mutate_mask = np.random.random((pop_size, self.n_users)) < self.mutation_rate
         
+        # This loop is unavoidable for variable-index manipulation, 
+        # but operation inside is fast
         for i in range(pop_size):
             for u in range(self.n_users):
                 if mutate_mask[i, u]:
+                    # Get indices
                     selected = np.where(mutated[i, u] == 1)[0]
                     unselected = np.where(mutated[i, u] == 0)[0]
                     
                     if len(selected) > 0 and len(unselected) > 0:
-                        to_remove = np.random.choice(selected)
-                        to_add = np.random.choice(unselected)
+                        # BALANCED MUTATION STRATEGY
+                        # 50% Smart Swap (Exploit): Improve score
+                        # 50% Random Swap (Explore): Allow quality drop for fairness
+                        
+                        if np.random.random() < 0.5:
+                            # --- Smart Swap (Greedy) ---
+                            # Remove Worst Selected
+                            cand_remove = np.random.choice(selected, size=min(3, len(selected)), replace=False)
+                            scores_remove = self.scores_matrix[u, cand_remove]
+                            to_remove = cand_remove[np.argmin(scores_remove)]
+                            
+                            # Add Best Unselected
+                            cand_add = np.random.choice(unselected, size=min(5, len(unselected)), replace=False)
+                            scores_add = self.scores_matrix[u, cand_add]
+                            to_add = cand_add[np.argmax(scores_add)]
+                        else:
+                            # --- Random Swap (Exploration) ---
+                            # Necessary to allow sacrificing quality for fairness
+                            to_remove = np.random.choice(selected)
+                            to_add = np.random.choice(unselected)
+                        
+                        # Perform swap
                         mutated[i, u, to_remove] = 0
                         mutated[i, u, to_add] = 1
                         
@@ -357,12 +417,12 @@ class GAOptimizer:
         print(f"\nStarting GA optimization (vectorized)...")
         start_time = time.time()
 
-        # Create initial population: greedy + random
-        population = self._create_random_population(self.population_size - 1)
-        population = np.concatenate([baseline_solution[np.newaxis, :, :], population], axis=0)
+        # Create initial population: greedy + perturbed greedy
+        population = self._create_initial_population(self.population_size)
 
         # Initial evaluation
-        start_epsilon = self.original_ugf
+        # Start slightly tighter than original to force immediate movement
+        start_epsilon = self.original_ugf * 0.99
         target_epsilon = self.epsilon
         fitnesses, ugf_gaps = self._calculate_fitness_batch(population, start_epsilon)
 
@@ -439,8 +499,11 @@ class GAOptimizer:
             final_solution = best_feasible_solution
             print("Using best FEASIBLE solution (constraint satisfied)")
         else:
-            final_solution = best_solution
-            print("Using best OVERALL solution (constraint may be violated)")
+            # If no feasible solution, use the best from the LAST generation
+            # (Do not use historical best_solution as it comes from Gen 0 with loose constraints)
+            last_gen_best_idx = np.argmax(fitnesses)
+            final_solution = population[last_gen_best_idx].copy()
+            print("Using best solution from FINAL generation (constraint violated)")
 
         # Final results with group breakdown
         print("\n" + "=" * 70)
@@ -537,9 +600,9 @@ if __name__ == "__main__":
         logger=logger,
         model_name=model_name,
         group_name=group_name,
-        population_size=100,
-        generations=100,
-        mutation_rate=0.3,
+        population_size=50,
+        generations=200,
+        mutation_rate=0.1,  # Lower mutation rate to preserve quality
         crossover_rate=0.8,
         elitism_count=5,
         penalty_lambda=None,

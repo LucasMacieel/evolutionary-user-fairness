@@ -316,6 +316,17 @@ class UGF(object):
 
         self.logger.info("\n")
 
+        # Capture final metrics for return
+        final_metrics = evaluation_methods(all_df, self.eval_metric_list)
+        
+        return {
+            "final_ugf": optimized_ugf,
+            "final_metrics": final_metrics,
+            "constraint_satisfied": optimized_ugf <= self.epsilon + 1e-6,
+            "original_ugf": original_ugf,
+            "epsilon": self.epsilon
+        }
+
 
 if __name__ == "__main__":
     """

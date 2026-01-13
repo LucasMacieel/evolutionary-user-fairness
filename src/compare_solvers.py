@@ -60,10 +60,10 @@ def run_comparison(
     os.makedirs(results_folder, exist_ok=True)
 
     # Setup logging
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # Removed specific timestamp to overwrite
     log_file = os.path.join(
         results_folder,
-        f"comparison_{model_name}_{dataset_name}_{group_name}_{timestamp}.log"
+        f"comparison_{model_name}_{dataset_name}_{group_name}.log"
     )
     logger = create_logger(name="comparison_logger", path=log_file)
 
@@ -100,7 +100,7 @@ def run_comparison(
 
     milp_logger = create_logger(
         name="milp_logger",
-        path=os.path.join(results_folder, f"milp_{model_name}_{dataset_name}_{group_name}_{timestamp}.log")
+        path=os.path.join(results_folder, f"milp_{model_name}_{dataset_name}_{group_name}.log")
     )
 
     milp_start = time.time()
@@ -114,7 +114,7 @@ def run_comparison(
         model_name=model_name,
         group_name=group_name,
     )
-    milp_optimizer.train()
+    milp_results = milp_optimizer.train()
     milp_time = time.time() - milp_start
 
     print(f"MILP completed in {milp_time:.2f} seconds")
@@ -140,7 +140,7 @@ def run_comparison(
 
     ga_logger = create_logger(
         name="ga_logger",
-        path=os.path.join(results_folder, f"ga_{model_name}_{dataset_name}_{group_name}_{timestamp}.log")
+        path=os.path.join(results_folder, f"ga_{model_name}_{dataset_name}_{group_name}.log")
     )
 
     ga_start = time.time()
@@ -154,11 +154,11 @@ def run_comparison(
         model_name=model_name,
         group_name=group_name,
         population_size=50,
-        generations=100,
+        generations=200,
         mutation_rate=0.1,
         crossover_rate=0.8,
         elitism_count=5,
-        penalty_lambda=1000.0,
+        penalty_lambda=None,  # Not used with stiffness penalty
         seed=42,
     )
     ga_results = ga_optimizer.train()
@@ -176,11 +176,25 @@ def run_comparison(
 
     # Create comparison table
     comparison_data = {
-        "Metric": ["CPU Time (s)", "Final UGF", "Constraint Satisfied"],
-        "MILP": [f"{milp_time:.2f}", "See MILP log", "See MILP log"],
+        "Metric": [
+            "CPU Time (s)", 
+            "Final UGF", 
+            "NDCG@10 (Overall)",
+            "F1@10 (Overall)",
+            "Constraint Satisfied"
+        ],
+        "MILP": [
+            f"{milp_time:.2f}", 
+            f"{milp_results['final_ugf']:.4f}" if milp_results else "N/A",
+            f"{milp_results['final_metrics'][0]:.4f}" if milp_results else "N/A",
+            f"{milp_results['final_metrics'][1]:.4f}" if milp_results else "N/A",
+            "Yes" if milp_results and milp_results['constraint_satisfied'] else "No"
+        ],
         "GA": [
             f"{ga_time:.2f}",
             f"{ga_results['final_ugf']:.4f}",
+            f"{ga_results['final_metrics'][0]:.4f}",
+            f"{ga_results['final_metrics'][1]:.4f}",
             "Yes" if ga_results["constraint_satisfied"] else "No",
         ],
     }
