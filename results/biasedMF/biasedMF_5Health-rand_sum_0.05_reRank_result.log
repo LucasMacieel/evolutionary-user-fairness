@@ -2,10 +2,5 @@ Model:biasedMF | Dataset:dataset\5Health-rand | Group:sum_0.05 |  Epsilon=None |
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392 
 Before optimization group 1 (active) scores  : ndcg@10=0.6772 f1@10=0.3304 
 Before optimization group 2 (inactive) scores: ndcg@10=0.3915 f1@10=0.1231 
+Before optimization UGF (f1@10): 0.2073 (20.73%)
 Dynamic epsilon: original_gap=0.2073, epsilon=0.1036
-After optimization overall metric scores     : ndcg@10=0.4209 f1@10=0.1433 
-After optimization group 1 (active) scores   : ndcg@10=0.5961 f1@10=0.2389 
-After optimization group 2 (inactive) scores : ndcg@10=0.4062 f1@10=0.1352 
-
-
-

@@ -1,68 +1,15 @@
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | GRU_metric=f1
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | GRU_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | GRU_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | GRU_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | GRU_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.0 | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.05 | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.05 | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-After optimization overall metric scores     : ndcg@10=0.3634 f1@10=0.1370 
-After optimization group 1 (active) scores   : ndcg@10=0.4274 f1@10=0.1832 
-After optimization group 2 (inactive) scores : ndcg@10=0.3581 f1@10=0.1332Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=0.085 | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
 Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=None | K=10 | Fairness_metric=f1
 Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
 Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
 Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
+Before optimization UGF (f1@10): 0.1713 (17.13%)
 Dynamic epsilon: original_gap=0.1713, epsilon=0.0857
+Solver status: Optimal
+CPU time: 110.81 seconds
 After optimization overall metric scores     : ndcg@10=0.3588 f1@10=0.1322 
 After optimization group 1 (active) scores   : ndcg@10=0.4797 f1@10=0.2114 
 After optimization group 2 (inactive) scores : ndcg@10=0.3489 f1@10=0.1257 
-
-
-
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=None | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Dynamic epsilon: original_gap=0.1713, epsilon=0.0857
-After optimization overall metric scores     : ndcg@10=0.3588 f1@10=0.1322 
-After optimization group 1 (active) scores   : ndcg@10=0.4797 f1@10=0.2114 
-After optimization group 2 (inactive) scores : ndcg@10=0.3489 f1@10=0.1257 
-
-
-
-Model:NCF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=None | K=10 | Fairness_metric=f1
-Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
-Before optimization group 1 (active) scores  : ndcg@10=0.6000 f1@10=0.2828 
-Before optimization group 2 (inactive) scores: ndcg@10=0.3310 f1@10=0.1115 
-Dynamic epsilon: original_gap=0.1713, epsilon=0.0857
-After optimization overall metric scores     : ndcg@10=0.3588 f1@10=0.1322 
-After optimization group 1 (active) scores   : ndcg@10=0.4797 f1@10=0.2114 
-After optimization group 2 (inactive) scores : ndcg@10=0.3489 f1@10=0.1257 
-
+After optimization UGF (f1@10): 0.0857 (8.57%)
+UGF reduction: 0.0857 (50.0% improvement)
 
 

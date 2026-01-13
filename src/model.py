@@ -209,22 +209,30 @@ class UGF(object):
             "Before optimization group 2 (inactive) scores",
         )
 
+        # Calculate and log original UGF
+        fairness_metric_k = self.fairness_metric + "@" + str(self.k)
+        original_ugf = self._calculate_ugf_gap(
+            group_df_list[0], group_df_list[1], fairness_metric_k
+        )
+        print(
+            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
+        )
+        self.logger.info(
+            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
+        )
+
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
         if self._epsilon_input == "auto":
-            fairness_metric_k = self.fairness_metric + "@" + str(self.k)
-            original_gap = self._calculate_ugf_gap(
-                group_df_list[0], group_df_list[1], fairness_metric_k
-            )
-            self.epsilon = original_gap / 2  # Half of original UGF gap
+            self.epsilon = original_ugf / 2  # Half of original UGF gap
             print(f"\nDynamic epsilon calculation (paper methodology):")
             print(
-                f"  Original UGF gap ({fairness_metric_k}): {original_gap:.4f} ({original_gap * 100:.2f}%)"
+                f"  Original UGF gap ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
             )
             print(
                 f"  Epsilon (half of gap): {self.epsilon:.4f} ({self.epsilon * 100:.2f}%)"
             )
             self.logger.info(
-                f"Dynamic epsilon: original_gap={original_gap:.4f}, epsilon={self.epsilon:.4f}"
+                f"Dynamic epsilon: original_gap={original_ugf:.4f}, epsilon={self.epsilon:.4f}"
             )
         else:
             self.epsilon = self._epsilon_input
@@ -241,11 +249,19 @@ class UGF(object):
         # Set objective function
         prob += pulp.lpSum(var_score_list)
 
-        # Optimize model
+        # Optimize model with timing
+        import time
+
         print("Solving optimization problem with PuLP (CBC solver)...")
+        start_time = time.time()
         prob.solve(pulp.PULP_CBC_CMD(msg=1))
+        end_time = time.time()
+        cpu_time = end_time - start_time
 
         print(f"\nStatus: {pulp.LpStatus[prob.status]}")
+        print(f"CPU time: {cpu_time:.2f} seconds")
+        self.logger.info(f"Solver status: {pulp.LpStatus[prob.status]}")
+        self.logger.info(f"CPU time: {cpu_time:.2f} seconds")
 
         # Format the output results and update q column of the dataframe
         self._format_result(all_vars, all_df)
@@ -274,7 +290,31 @@ class UGF(object):
             self.eval_metric_list,
             "After optimization group 2 (inactive) scores ",
         )
-        self.logger.info("\n\n")
+
+        # Calculate and log optimized UGF
+        optimized_ugf = self._calculate_ugf_gap(
+            group_df_list[0], group_df_list[1], fairness_metric_k
+        )
+        print(
+            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%)"
+        )
+        self.logger.info(
+            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%)"
+        )
+
+        # Log UGF improvement
+        ugf_reduction = original_ugf - optimized_ugf
+        ugf_reduction_pct = (
+            (ugf_reduction / original_ugf) * 100 if original_ugf > 0 else 0
+        )
+        print(
+            f"UGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}% improvement)"
+        )
+        self.logger.info(
+            f"UGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}% improvement)"
+        )
+
+        self.logger.info("\n")
 
 
 if __name__ == "__main__":
