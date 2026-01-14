@@ -42,6 +42,8 @@ class GAOptimizer:
         crossover_rate: float = 0.8,
         elitism_count: int = 5,
         penalty_lambda: float = None,
+        local_search_prob: float = 0.5,
+        local_search_iters: int = 3,
         seed: int = None,
     ):
         """Initialize GA optimizer with vectorized data structures."""
@@ -64,6 +66,10 @@ class GAOptimizer:
         self.elitism_count = elitism_count
         self._penalty_lambda_input = penalty_lambda
         self.penalty_lambda = None
+
+        # Memetic Algorithm (local search) parameters
+        self.local_search_prob = local_search_prob
+        self.local_search_iters = local_search_iters
 
         if seed is not None:
             random.seed(seed)
@@ -120,6 +126,18 @@ class GAOptimizer:
         # Pre-compute denominators for F1
         self.f1_denominator = self.total_relevant + self.k
 
+        # Pre-compute NDCG discount weights: 1/log2(rank+2) for ranks 0..k-1
+        # Using method=1 from rank_metrics.py
+        self.ndcg_discounts = 1.0 / np.log2(np.arange(2, self.k + 2))  # shape (k,)
+
+        # Pre-compute ideal DCG per user (for normalization)
+        # Ideal ranking = all 1s up to min(total_relevant, k)
+        self.ideal_dcg = np.zeros(self.n_users, dtype=np.float32)
+        for u in range(self.n_users):
+            n_rel = min(int(self.total_relevant[u]), self.k)
+            if n_rel > 0:
+                self.ideal_dcg[u] = np.sum(self.ndcg_discounts[:n_rel])
+
         self.n_g1 = self.g1_mask.sum()
         self.n_g2 = self.g2_mask.sum()
 
@@ -148,35 +166,70 @@ class GAOptimizer:
         objectives = (population * self.scores_matrix).sum(axis=(1, 2))  # (pop_size,)
 
         # 2. Constraint: Fairness (UGF <= epsilon)
+        # Calculate metric per user based on fairness_metric setting
 
-        # Calculate selected labels per user per individual
-        selected_labels = (
-            population * self.labels_matrix
-        )  # (pop_size, n_users, n_items)
-        selected_relevant = selected_labels.sum(axis=2)  # (pop_size, n_users)
+        if self.fairness_metric == "ndcg":
+            # Create masked scores: selected items keep their score, unselected get -inf
+            # population: (pop_size, n_users, n_items), scores_matrix: (n_users, n_items)
+            masked_scores = np.where(
+                population == 1,
+                self.scores_matrix,  # broadcasts to (pop_size, n_users, n_items)
+                -np.inf,
+            )
 
-        # F1 metric per user: 2 * selected_relevant / (total_relevant + k)
-        # Only for users with relevant items
-        with np.errstate(divide="ignore", invalid="ignore"):
-            f1_per_user = (
-                2 * selected_relevant / self.f1_denominator
+            # Argsort descending to get ranking (top-k indices per user)
+            # We only need the top-k, but argsort gives all - we'll slice later
+            ranked_indices = np.argsort(-masked_scores, axis=2)[
+                :, :, : self.k
+            ]  # (pop_size, n_users, k)
+
+            # Gather labels at ranked positions
+            # We need advanced indexing: for each (pop, user), get labels at ranked_indices
+            user_idx = np.arange(self.n_users)[None, :, None]  # (1, n_users, 1)
+            ranked_labels = self.labels_matrix[
+                user_idx, ranked_indices
+            ]  # (pop_size, n_users, k)
+
+            # Compute DCG: sum(label[i] * discount[i]) for i in 0..k-1
+            dcg = (ranked_labels * self.ndcg_discounts).sum(
+                axis=2
             )  # (pop_size, n_users)
-            f1_per_user = np.nan_to_num(f1_per_user, 0)
+
+            # Compute NDCG = DCG / ideal_DCG
+            with np.errstate(divide="ignore", invalid="ignore"):
+                metric_per_user = dcg / self.ideal_dcg  # (pop_size, n_users)
+                metric_per_user = np.nan_to_num(metric_per_user, 0)
+
+        else:
+            # F1-based fairness metric (default)
+            # Calculate selected labels per user per individual
+            selected_labels = (
+                population * self.labels_matrix
+            )  # (pop_size, n_users, n_items)
+            selected_relevant = selected_labels.sum(axis=2)  # (pop_size, n_users)
+
+            # F1 metric per user: 2 * selected_relevant / (total_relevant + k)
+            # Only for users with relevant items
+            with np.errstate(divide="ignore", invalid="ignore"):
+                metric_per_user = (
+                    2 * selected_relevant / self.f1_denominator
+                )  # (pop_size, n_users)
+                metric_per_user = np.nan_to_num(metric_per_user, 0)
 
         # Mask users without relevant items
-        f1_per_user[:, ~self.has_relevant] = 0
+        metric_per_user[:, ~self.has_relevant] = 0
 
         # Group averages
         g1_has_relevant = self.g1_mask & self.has_relevant
         g2_has_relevant = self.g2_mask & self.has_relevant
 
         g1_avg = (
-            f1_per_user[:, g1_has_relevant].mean(axis=1)
+            metric_per_user[:, g1_has_relevant].mean(axis=1)
             if g1_has_relevant.sum() > 0
             else np.zeros(pop_size)
         )
         g2_avg = (
-            f1_per_user[:, g2_has_relevant].mean(axis=1)
+            metric_per_user[:, g2_has_relevant].mean(axis=1)
             if g2_has_relevant.sum() > 0
             else np.zeros(pop_size)
         )
@@ -371,6 +424,174 @@ class GAOptimizer:
 
         return mutated
 
+    def _local_search_batch(
+        self, population: np.ndarray, signed_ugf: np.ndarray
+    ) -> np.ndarray:
+        """
+        Apply local search (Lamarckian learning) to improve individuals.
+
+        This transforms the GA into a Memetic Algorithm by refining solutions
+        through local hill-climbing after genetic operations.
+
+        Uses two complementary strategies:
+        1. Quality-focused: Greedy hill-climbing to maximize objective
+        2. Fairness-focused: Group-aware swaps to reduce UGF violation
+
+        Args:
+            population: shape (pop_size, n_users, n_items)
+            signed_ugf: shape (pop_size,) - Current UGF direction per individual
+
+        Returns:
+            Improved population
+        """
+        pop_size = population.shape[0]
+        improved = population.copy()
+
+        # Decide which individuals receive local search
+        apply_ls = np.random.random(pop_size) < self.local_search_prob
+
+        for i in range(pop_size):
+            if not apply_ls[i]:
+                continue
+
+            # Determine strategy based on constraint status
+            # If individual violates fairness, use fairness-focused search
+            # Otherwise use quality-focused search
+            bias = signed_ugf[i] if i < len(signed_ugf) else 0.0
+            needs_fairness_repair = abs(bias) > (self.epsilon if self.epsilon else 0.05)
+
+            if needs_fairness_repair:
+                improved[i] = self._local_search_fairness(improved[i], bias)
+            else:
+                improved[i] = self._local_search_quality(improved[i])
+
+        return improved
+
+    def _local_search_quality(self, individual: np.ndarray) -> np.ndarray:
+        """
+        Quality-focused local search (hill-climbing).
+
+        For each user, iteratively swap the worst selected item with the
+        best unselected item until no improvement is possible or max
+        iterations reached.
+
+        This is the 'greedy meme' from the paper - maximizes objective.
+        """
+        improved = individual.copy()
+
+        for u in range(self.n_users):
+            for _ in range(self.local_search_iters):
+                selected = np.where(improved[u] == 1)[0]
+                unselected = np.where(improved[u] == 0)[0]
+
+                if len(selected) == 0 or len(unselected) == 0:
+                    break
+
+                # Find worst selected (lowest score)
+                selected_scores = self.scores_matrix[u, selected]
+                worst_idx = selected[np.argmin(selected_scores)]
+                worst_score = self.scores_matrix[u, worst_idx]
+
+                # Find best unselected (highest score)
+                unselected_scores = self.scores_matrix[u, unselected]
+                best_idx = unselected[np.argmax(unselected_scores)]
+                best_score = self.scores_matrix[u, best_idx]
+
+                # Only swap if it improves the objective
+                if best_score > worst_score:
+                    improved[u, worst_idx] = 0
+                    improved[u, best_idx] = 1
+                else:
+                    # No more improvement possible for this user
+                    break
+
+        return improved
+
+    def _local_search_fairness(
+        self, individual: np.ndarray, bias_dir: float
+    ) -> np.ndarray:
+        """
+        Fairness-focused local search (constraint repair).
+
+        Adjusts selections to reduce UGF gap between groups:
+        - If G1 > G2 (bias > 0): Suppress G1 users, boost G2 users
+        - If G2 > G1 (bias < 0): Suppress G2 users, boost G1 users
+
+        'Suppress' = swap good items for worse ones (reduce group metric)
+        'Boost' = swap bad items for better ones (increase group metric)
+
+        This is a specialized meme for constrained optimization.
+        """
+        improved = individual.copy()
+
+        for u in range(self.n_users):
+            selected = np.where(improved[u] == 1)[0]
+            unselected = np.where(improved[u] == 0)[0]
+
+            if len(selected) == 0 or len(unselected) == 0:
+                continue
+
+            is_g1 = self.g1_mask[u]
+            is_g2 = self.g2_mask[u]
+
+            # Determine user's role in rebalancing
+            # bias_dir > 0 means G1 is advantaged
+            if bias_dir > 0:
+                if is_g1:
+                    strategy = "suppress"  # Lower G1's advantage
+                elif is_g2:
+                    strategy = "boost"  # Raise G2 to match
+                else:
+                    continue  # User not in either group
+            else:
+                if is_g1:
+                    strategy = "boost"  # Raise G1 to match
+                elif is_g2:
+                    strategy = "suppress"  # Lower G2's advantage
+                else:
+                    continue
+
+            # Apply local search iterations
+            for _ in range(self.local_search_iters):
+                selected = np.where(improved[u] == 1)[0]
+                unselected = np.where(improved[u] == 0)[0]
+
+                if len(selected) == 0 or len(unselected) == 0:
+                    break
+
+                if strategy == "boost":
+                    # Swap worst selected for best unselected
+                    selected_scores = self.scores_matrix[u, selected]
+                    worst_idx = selected[np.argmin(selected_scores)]
+
+                    unselected_scores = self.scores_matrix[u, unselected]
+                    best_idx = unselected[np.argmax(unselected_scores)]
+
+                    # Only swap if improvement exists
+                    if (
+                        self.scores_matrix[u, best_idx]
+                        > self.scores_matrix[u, worst_idx]
+                    ):
+                        improved[u, worst_idx] = 0
+                        improved[u, best_idx] = 1
+                    else:
+                        break
+
+                else:  # suppress
+                    # Swap best selected for worst unselected
+                    # (sacrifice quality to lower metric)
+                    selected_scores = self.scores_matrix[u, selected]
+                    best_selected_idx = selected[np.argmax(selected_scores)]
+
+                    unselected_scores = self.scores_matrix[u, unselected]
+                    worst_unselected_idx = unselected[np.argmin(unselected_scores)]
+
+                    # Always apply for constraint repair
+                    improved[u, best_selected_idx] = 0
+                    improved[u, worst_unselected_idx] = 1
+
+        return improved
+
     def _tournament_selection(
         self,
         population: np.ndarray,
@@ -477,14 +698,17 @@ class GAOptimizer:
         }
 
     def train(self) -> Dict:
-        """Run GA optimization with vectorized operations."""
+        """Run Memetic Algorithm optimization with vectorized operations."""
         self.logger.info(
-            f"GA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
+            f"Memetic Algorithm | Model:{self.model_name} | Dataset:{self.dataset_name} | "
             f"Group:{self.group_name} | K={self.k} | Fairness_metric={self.fairness_metric}"
         )
         self.logger.info(
             f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
             f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
+        )
+        self.logger.info(
+            f"Local Search | Prob:{self.local_search_prob} | Iters:{self.local_search_iters}"
         )
 
         # Print original metrics (overall and per group)
@@ -550,7 +774,7 @@ class GAOptimizer:
         print(f"  Target epsilon: {self.epsilon:.4f}")
 
         # Initialize population
-        print("\nStarting GA optimization (vectorized)...")
+        print("\nStarting Memetic Algorithm optimization (GA + Local Search)...")
         start_time = time.time()
 
         # Create initial population: greedy + perturbed greedy
@@ -624,6 +848,10 @@ class GAOptimizer:
             # Mutation with Repair Bias
             offspring = self._mutate_batch(offspring, bias_dir=avg_bias)
 
+            # Local Search (Lamarckian Learning) - transforms GA into Memetic Algorithm
+            # Apply local refinement to offspring before adding to population
+            offspring = self._local_search_batch(offspring, signed_ugf)
+
             # New population
             population = np.concatenate([elites, offspring], axis=0)
 
@@ -658,11 +886,10 @@ class GAOptimizer:
                     ].copy()
 
             # Progress logging
-            if gen % 10 == 0 or gen == self.generations - 1:
-                print(
-                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}, best_obj={gen_best_fitness:.2f}, "
-                    f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
-                )
+            print(
+                f"  Gen {gen + 1}: eps={current_epsilon:.4f}, best_obj={gen_best_fitness:.2f}, "
+                f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
+            )
 
         cpu_time = time.time() - start_time
         print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
@@ -800,11 +1027,13 @@ if __name__ == "__main__":
         group_name=group_name,
         population_size=50,
         generations=200,
-        mutation_rate=0.1,  # Lower mutation rate to preserve quality
+        mutation_rate=0.1,
         crossover_rate=0.8,
         elitism_count=5,
         penalty_lambda=None,
         seed=42,
+        local_search_prob=0.5,
+        local_search_iters=3
     )
 
     results = ga.train()
