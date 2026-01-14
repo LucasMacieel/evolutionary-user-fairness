@@ -15,7 +15,7 @@ from datetime import datetime
 import pandas as pd
 
 from data_loader import DataLoader
-from utils.tools import create_logger, evaluation_methods
+from utils.tools import create_logger
 
 # Import optimizers
 from model import UGF as MILPOptimizer
@@ -62,13 +62,12 @@ def run_comparison(
     # Setup logging
     # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # Removed specific timestamp to overwrite
     log_file = os.path.join(
-        results_folder,
-        f"comparison_{model_name}_{dataset_name}_{group_name}.log"
+        results_folder, f"comparison_{model_name}_{dataset_name}_{group_name}.log"
     )
     logger = create_logger(name="comparison_logger", path=log_file)
 
     print("=" * 80)
-    print(f"MILP vs GA Comparison")
+    print("MILP vs GA Comparison")
     print(f"Dataset: {dataset_name} | Model: {model_name} | Grouping: {group_name}")
     print("=" * 80)
     logger.info(f"Comparison: {dataset_name} | {model_name} | {group_name}")
@@ -100,7 +99,9 @@ def run_comparison(
 
     milp_logger = create_logger(
         name="milp_logger",
-        path=os.path.join(results_folder, f"milp_{model_name}_{dataset_name}_{group_name}.log")
+        path=os.path.join(
+            results_folder, f"milp_{model_name}_{dataset_name}_{group_name}.log"
+        ),
     )
 
     milp_start = time.time()
@@ -140,7 +141,9 @@ def run_comparison(
 
     ga_logger = create_logger(
         name="ga_logger",
-        path=os.path.join(results_folder, f"ga_{model_name}_{dataset_name}_{group_name}.log")
+        path=os.path.join(
+            results_folder, f"ga_{model_name}_{dataset_name}_{group_name}.log"
+        ),
     )
 
     ga_start = time.time()
@@ -177,18 +180,18 @@ def run_comparison(
     # Create comparison table
     comparison_data = {
         "Metric": [
-            "CPU Time (s)", 
-            "Final UGF", 
+            "CPU Time (s)",
+            "Final UGF",
             "NDCG@10 (Overall)",
             "F1@10 (Overall)",
-            "Constraint Satisfied"
+            "Constraint Satisfied",
         ],
         "MILP": [
-            f"{milp_time:.2f}", 
+            f"{milp_time:.2f}",
             f"{milp_results['final_ugf']:.4f}" if milp_results else "N/A",
             f"{milp_results['final_metrics'][0]:.4f}" if milp_results else "N/A",
             f"{milp_results['final_metrics'][1]:.4f}" if milp_results else "N/A",
-            "Yes" if milp_results and milp_results['constraint_satisfied'] else "No"
+            "Yes" if milp_results and milp_results["constraint_satisfied"] else "No",
         ],
         "GA": [
             f"{ga_time:.2f}",
@@ -213,20 +216,19 @@ def run_comparison(
     print(f"\nDetailed logs saved to: {results_folder}")
     print(f"Comparison log: {log_file}")
 
-
     return {
         "Dataset": dataset_name,
         "Model": model_name,
         "Group": group_name,
         "MILP_Time": milp_time,
-        "MILP_UGF": milp_results['final_ugf'] if milp_results else None,
-        "MILP_NDCG": milp_results['final_metrics'][0] if milp_results else None,
-        "MILP_F1": milp_results['final_metrics'][1] if milp_results else None,
+        "MILP_UGF": milp_results["final_ugf"] if milp_results else None,
+        "MILP_NDCG": milp_results["final_metrics"][0] if milp_results else None,
+        "MILP_F1": milp_results["final_metrics"][1] if milp_results else None,
         "GA_Time": ga_time,
-        "GA_UGF": ga_results['final_ugf'],
-        "GA_NDCG": ga_results['final_metrics'][0],
-        "GA_F1": ga_results['final_metrics'][1],
-        "GA_Satisfied": ga_results["constraint_satisfied"]
+        "GA_UGF": ga_results["final_ugf"],
+        "GA_NDCG": ga_results["final_metrics"][0],
+        "GA_F1": ga_results["final_metrics"][1],
+        "GA_Satisfied": ga_results["constraint_satisfied"],
     }
 
 
@@ -235,7 +237,7 @@ if __name__ == "__main__":
     DATASETS = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
     MODELS = ["NCF", "biasedMF"]
     GROUPS = ["0.05_count", "sum_0.05", "max_0.05"]
-    
+
     # Check for command line args (single run mode)
     if len(sys.argv) >= 4:
         # Run single
@@ -247,57 +249,69 @@ if __name__ == "__main__":
     else:
         # Run batch over all combinations
         total_runs = len(DATASETS) * len(MODELS) * len(GROUPS)
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print(f"Running Full Benchmark: {total_runs} experiments")
         print(f"Datasets: {DATASETS}")
         print(f"Models:   {MODELS}")
         print(f"Groups:   {GROUPS}")
-        print("="*80 + "\n")
-        
+        print("=" * 80 + "\n")
+
         all_results = []
         run_count = 0
-        
+
         for dataset in DATASETS:
             for model in MODELS:
                 for group in GROUPS:
                     run_count += 1
-                    print(f"\nProcessing [{run_count}/{total_runs}]: {dataset} | {model} | {group}...")
+                    print(
+                        f"\nProcessing [{run_count}/{total_runs}]: {dataset} | {model} | {group}..."
+                    )
                     try:
                         res = run_comparison(
-                            dataset_name=dataset,
-                            model_name=model,
-                            group_name=group
+                            dataset_name=dataset, model_name=model, group_name=group
                         )
                         all_results.append(res)
                     except Exception as e:
                         print(f"Error processing {dataset}|{model}|{group}: {e}")
                         # Append error result to keep track
-                        all_results.append({
-                            "Dataset": dataset, "Model": model, "Group": group,
-                            "MILP_Time": 0, "GA_Time": 0,
-                            "GA_Satisfied": f"Error: {str(e)}"
-                        })
-                
+                        all_results.append(
+                            {
+                                "Dataset": dataset,
+                                "Model": model,
+                                "Group": group,
+                                "MILP_Time": 0,
+                                "GA_Time": 0,
+                                "GA_Satisfied": f"Error: {str(e)}",
+                            }
+                        )
+
         # Create Master Summary
         if all_results:
             df_master = pd.DataFrame(all_results)
-            
+
             # Reorder columns (ensure validation even if some columns missing due to errors)
-            cols = ["Dataset", "Model", "Group", 
-                    "MILP_Time", "GA_Time", 
-                    "MILP_UGF", "GA_UGF", 
-                    "MILP_NDCG", "GA_NDCG", 
-                    "GA_Satisfied"]
-            
+            cols = [
+                "Dataset",
+                "Model",
+                "Group",
+                "MILP_Time",
+                "GA_Time",
+                "MILP_UGF",
+                "GA_UGF",
+                "MILP_NDCG",
+                "GA_NDCG",
+                "GA_Satisfied",
+            ]
+
             # Filter columns that actually exist in the dataframe
             final_cols = [c for c in cols if c in df_master.columns]
             df_master = df_master[final_cols]
-            
-            print("\n" + "="*80)
+
+            print("\n" + "=" * 80)
             print("MASTER COMPARISON SUMMARY")
-            print("="*80)
+            print("=" * 80)
             print(df_master.to_string(index=False))
-            
+
             # Save to CSV
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             save_path = f"../results/comparison/master_summary_{timestamp}.csv"

@@ -1,5 +1,6 @@
 import logging
-from utils.rank_metrics import *
+import numpy as np
+from utils.rank_metrics import ndcg_at_k, precision_at_k
 
 
 def create_logger(name="result_logger", path="results.log"):

@@ -1,5 +1,5 @@
 from data_loader import DataLoader
-from utils.tools import *
+from utils.tools import create_logger, evaluation_methods
 import pandas as pd
 import pulp
 import os
@@ -224,7 +224,7 @@ class UGF(object):
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
         if self._epsilon_input == "auto":
             self.epsilon = original_ugf / 4  # One quarter of original UGF gap
-            print(f"\nDynamic epsilon calculation (paper methodology):")
+            print("\nDynamic epsilon calculation (paper methodology):")
             print(
                 f"  Original UGF gap ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
             )
@@ -318,13 +318,13 @@ class UGF(object):
 
         # Capture final metrics for return
         final_metrics = evaluation_methods(all_df, self.eval_metric_list)
-        
+
         return {
             "final_ugf": optimized_ugf,
             "final_metrics": final_metrics,
             "constraint_satisfied": optimized_ugf <= self.epsilon + 1e-6,
             "original_ugf": original_ugf,
-            "epsilon": self.epsilon
+            "epsilon": self.epsilon,
         }
 
 
@@ -451,7 +451,7 @@ if __name__ == "__main__":
                         }
                     )
 
-                    print(f"  ✓ Completed successfully")
+                    print("  ✓ Completed successfully")
 
                 except Exception as e:
                     print(f"  ✗ Error: {str(e)}")
