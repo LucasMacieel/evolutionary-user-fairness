@@ -8,10 +8,6 @@ This module implements a GA that solves the same problem as the MILP solver:
 - maximize sum of preference scores (S_ij * W_ij)
 - subject to fairness constraint: |UGF(group1, group2)| <= epsilon
 - subject to selection constraint: exactly K items per user
-
-Enhanced with Memetic Algorithm features:
-- Local search (Lamarckian learning)
-- Adaptive meme selection (Biased Roulette Wheel from the paper)
 """
 
 import numpy as np
@@ -21,83 +17,6 @@ import random
 from typing import List, Tuple, Dict
 from data_loader import DataLoader
 from utils.tools import create_logger, evaluation_methods
-
-
-class MemePool:
-    """
-    Adaptive meme selection using Biased Roulette Wheel strategy.
-
-    Based on "Classification of Adaptive Memetic Algorithms: A Comparative Study"
-    by Ong et al. (IEEE Trans. SMC-B, 2006).
-
-    Implements global-level quantitative adaptation which the paper shows
-    outperforms other adaptation strategies.
-    """
-
-    def __init__(self, meme_names: List[str], learning_rate: float = 0.1):
-        """
-        Initialize meme pool.
-
-        Args:
-            meme_names: List of meme strategy names
-            learning_rate: How quickly to update rewards (0-1)
-        """
-        self.meme_names = meme_names
-        self.learning_rate = learning_rate
-
-        # Initialize equal rewards for all memes
-        self.rewards = {name: 1.0 for name in meme_names}
-
-        # Track statistics
-        self.usage_counts = {name: 0 for name in meme_names}
-        self.total_improvements = {name: 0.0 for name in meme_names}
-
-    def select_meme(self) -> str:
-        """
-        Select a meme using Biased Roulette Wheel.
-
-        Probability of selecting meme M_c = reward(M_c) / sum(all rewards)
-        """
-        total = sum(self.rewards.values())
-        probs = np.array([self.rewards[m] / total for m in self.meme_names])
-        # Renormalize to handle floating point precision issues
-        probs = probs / probs.sum()
-        return np.random.choice(self.meme_names, p=probs)
-
-    def update_reward(self, meme_name: str, improvement: float):
-        """
-        Update meme reward based on improvement achieved.
-
-        Uses exponential moving average:
-        reward = (1 - lr) * old_reward + lr * max(0, improvement + baseline)
-
-        Args:
-            meme_name: Name of the meme used
-            improvement: Objective improvement (can be negative)
-        """
-        self.usage_counts[meme_name] += 1
-        self.total_improvements[meme_name] += max(0, improvement)
-
-        # EMA update with floor to prevent rewards from going to zero
-        baseline = 0.1  # Small baseline to keep all memes viable
-        new_signal = max(0, improvement) + baseline
-        self.rewards[meme_name] = (1 - self.learning_rate) * self.rewards[
-            meme_name
-        ] + self.learning_rate * new_signal
-
-        # Ensure minimum reward (prevent starvation)
-        min_reward = 0.01
-        self.rewards[meme_name] = max(min_reward, self.rewards[meme_name])
-
-    def get_probabilities(self) -> Dict[str, float]:
-        """Get current selection probabilities."""
-        total = sum(self.rewards.values())
-        return {m: self.rewards[m] / total for m in self.meme_names}
-
-    def get_stats(self) -> str:
-        """Get formatted statistics string."""
-        probs = self.get_probabilities()
-        return " | ".join([f"{m}:{probs[m]:.1%}" for m in self.meme_names])
 
 
 class GAOptimizer:
@@ -111,21 +30,18 @@ class GAOptimizer:
         data_loader: DataLoader,
         k: int = 10,
         eval_metric_list: List[str] = None,
+        fairness_metric: str = "f1",
         epsilon: float = None,
         logger=None,
         model_name: str = "",
         group_name: str = "",
         # GA parameters
-        population_size: int = 100,
-        generations: int = 200,
-        mutation_rate: float = 0.15,
-        mutation_rate_min: float = 0.02,
-        crossover_rate: float = 0.9,
-        crossover_rate_min: float = 0.6,
+        population_size: int = 50,
+        generations: int = 50,
+        mutation_rate: float = 0.1,
+        crossover_rate: float = 0.8,
         elitism_count: int = 5,
         penalty_lambda: float = None,
-        local_search_prob: float = 0.5,
-        local_search_iters: int = 3,
         seed: int = None,
     ):
         """Initialize GA optimizer with vectorized data structures."""
@@ -133,7 +49,7 @@ class GAOptimizer:
         self.dataset_name = data_loader.path.split("/")[-1]
         self.k = k
         self.eval_metric_list = eval_metric_list or ["ndcg@10", "f1@10"]
-        self.fairness_metric = "f1"  # Always use F1 for fairness constraint
+        self.fairness_metric = fairness_metric
         self._epsilon_input = epsilon
         self.epsilon = None
         self.original_ugf = None
@@ -144,21 +60,10 @@ class GAOptimizer:
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
-        self.mutation_rate_min = mutation_rate_min
         self.crossover_rate = crossover_rate
-        self.crossover_rate_min = crossover_rate_min
         self.elitism_count = elitism_count
         self._penalty_lambda_input = penalty_lambda
         self.penalty_lambda = None
-
-        # Memetic Algorithm (local search) parameters
-        self.local_search_prob = local_search_prob
-        self.local_search_iters = local_search_iters
-
-        # Initialize adaptive meme pool with three strategies
-        self.meme_pool = MemePool(
-            meme_names=["quality", "fairness", "hybrid"], learning_rate=0.1
-        )
 
         if seed is not None:
             random.seed(seed)
@@ -221,30 +126,6 @@ class GAOptimizer:
         print(f"Vectorized data: {self.n_users} users, {self.n_items} items per user")
         print(f"Group 1: {self.n_g1} users, Group 2: {self.n_g2} users")
 
-    def _get_adaptive_rates(self, progress: float) -> Tuple[float, float]:
-        """
-        Compute adaptive mutation and crossover rates based on evolution progress.
-
-        Uses linear decay from initial (exploration) to final (exploitation) values.
-        This follows the adaptive strategy suggested in the literature for balancing
-        exploration in early generations and exploitation in later generations.
-
-        Args:
-            progress: Evolution progress from 0.0 (start) to 1.0 (end)
-
-        Returns:
-            (current_mutation_rate, current_crossover_rate)
-        """
-        # Linear decay: rate = max_rate - progress * (max_rate - min_rate)
-        current_mutation = self.mutation_rate - progress * (
-            self.mutation_rate - self.mutation_rate_min
-        )
-        current_crossover = self.crossover_rate - progress * (
-            self.crossover_rate - self.crossover_rate_min
-        )
-
-        return current_mutation, current_crossover
-
     def _calculate_fitness_batch(
         self, population: np.ndarray, current_epsilon: float
     ) -> Tuple[np.ndarray, np.ndarray]:
@@ -267,8 +148,7 @@ class GAOptimizer:
         objectives = (population * self.scores_matrix).sum(axis=(1, 2))  # (pop_size,)
 
         # 2. Constraint: Fairness (UGF <= epsilon)
-        # Calculate F1 metric per user for fairness constraint
-        # F1-based fairness metric
+
         # Calculate selected labels per user per individual
         selected_labels = (
             population * self.labels_matrix
@@ -278,25 +158,25 @@ class GAOptimizer:
         # F1 metric per user: 2 * selected_relevant / (total_relevant + k)
         # Only for users with relevant items
         with np.errstate(divide="ignore", invalid="ignore"):
-            metric_per_user = (
+            f1_per_user = (
                 2 * selected_relevant / self.f1_denominator
             )  # (pop_size, n_users)
-            metric_per_user = np.nan_to_num(metric_per_user, 0)
+            f1_per_user = np.nan_to_num(f1_per_user, 0)
 
         # Mask users without relevant items
-        metric_per_user[:, ~self.has_relevant] = 0
+        f1_per_user[:, ~self.has_relevant] = 0
 
         # Group averages
         g1_has_relevant = self.g1_mask & self.has_relevant
         g2_has_relevant = self.g2_mask & self.has_relevant
 
         g1_avg = (
-            metric_per_user[:, g1_has_relevant].mean(axis=1)
+            f1_per_user[:, g1_has_relevant].mean(axis=1)
             if g1_has_relevant.sum() > 0
             else np.zeros(pop_size)
         )
         g2_avg = (
-            metric_per_user[:, g2_has_relevant].mean(axis=1)
+            f1_per_user[:, g2_has_relevant].mean(axis=1)
             if g2_has_relevant.sum() > 0
             else np.zeros(pop_size)
         )
@@ -362,28 +242,24 @@ class GAOptimizer:
         return individual
 
     def _crossover_batch(
-        self, parents1: np.ndarray, parents2: np.ndarray, crossover_rate: float = None
+        self, parents1: np.ndarray, parents2: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Uniform crossover at user level for batch of parents.
 
         Args:
             parents1, parents2: shape (batch_size, n_users, n_items)
-            crossover_rate: Current crossover probability (for adaptive rates)
 
         Returns:
             children1, children2: same shape
         """
-        if crossover_rate is None:
-            crossover_rate = self.crossover_rate
-
         batch_size = parents1.shape[0]
 
         # Decide which users come from which parent
         crossover_mask = np.random.random((batch_size, self.n_users, 1)) < 0.5
 
         # Apply crossover with probability
-        do_crossover = np.random.random(batch_size) < crossover_rate
+        do_crossover = np.random.random(batch_size) < self.crossover_rate
         do_crossover = do_crossover[:, np.newaxis, np.newaxis]
 
         children1 = np.where(do_crossover & crossover_mask, parents2, parents1)
@@ -392,7 +268,7 @@ class GAOptimizer:
         return children1, children2
 
     def _mutate_batch(
-        self, population: np.ndarray, bias_dir: float = 0.0, mutation_rate: float = None
+        self, population: np.ndarray, bias_dir: float = 0.0
     ) -> np.ndarray:
         """
         Smart Swap Mutation with Repair Bias.
@@ -402,16 +278,12 @@ class GAOptimizer:
             bias_dir: Global bias direction (G1_avg - G2_avg).
                       positive -> G1 advantage (Need to suppress G1 / boost G2)
                       negative -> G2 advantage (Need to suppress G2 / boost G1)
-            mutation_rate: Current mutation probability (for adaptive rates)
         """
-        if mutation_rate is None:
-            mutation_rate = self.mutation_rate
-
         pop_size = population.shape[0]
         mutated = population.copy()
 
         # Decide which users to mutate for each individual
-        mutate_mask = np.random.random((pop_size, self.n_users)) < mutation_rate
+        mutate_mask = np.random.random((pop_size, self.n_users)) < self.mutation_rate
 
         # Repair logic thresholds
         apply_repair = abs(bias_dir) > (self.epsilon if self.epsilon else 0.05)
@@ -498,192 +370,6 @@ class GAOptimizer:
                         mutated[i, u, to_add] = 1
 
         return mutated
-
-    def _local_search_batch(
-        self, population: np.ndarray, signed_ugf: np.ndarray
-    ) -> np.ndarray:
-        """
-        Apply local search with adaptive meme selection (Lamarckian learning).
-
-        Uses Biased Roulette Wheel to select between meme strategies based on
-        their historical performance, following the paper's global-level
-        quantitative adaptation approach.
-
-        Three meme strategies:
-        1. quality: Greedy hill-climbing to maximize objective
-        2. fairness: Group-aware swaps to reduce UGF violation
-        3. hybrid: Quality first, then fairness repair if needed
-
-        Args:
-            population: shape (pop_size, n_users, n_items)
-            signed_ugf: shape (pop_size,) - Current UGF direction per individual
-
-        Returns:
-            Improved population
-        """
-        pop_size = population.shape[0]
-        improved = population.copy()
-
-        # Decide which individuals receive local search
-        apply_ls = np.random.random(pop_size) < self.local_search_prob
-
-        for i in range(pop_size):
-            if not apply_ls[i]:
-                continue
-
-            # Calculate pre-improvement objective (sum of selected scores)
-            pre_obj = (population[i] * self.scores_matrix).sum()
-
-            # Get bias for this individual
-            bias = signed_ugf[i] if i < len(signed_ugf) else 0.0
-
-            # Select meme using adaptive Biased Roulette Wheel
-            selected_meme = self.meme_pool.select_meme()
-
-            # Apply selected meme strategy
-            if selected_meme == "quality":
-                improved[i] = self._local_search_quality(improved[i])
-            elif selected_meme == "fairness":
-                improved[i] = self._local_search_fairness(improved[i], bias)
-            else:  # hybrid
-                # First maximize quality, then repair fairness if needed
-                improved[i] = self._local_search_quality(improved[i])
-                if abs(bias) > (self.epsilon if self.epsilon else 0.05):
-                    improved[i] = self._local_search_fairness(improved[i], bias)
-
-            # Calculate post-improvement objective
-            post_obj = (improved[i] * self.scores_matrix).sum()
-            improvement = post_obj - pre_obj
-
-            # Update meme reward based on improvement achieved
-            self.meme_pool.update_reward(selected_meme, improvement)
-
-        return improved
-
-    def _local_search_quality(self, individual: np.ndarray) -> np.ndarray:
-        """
-        Quality-focused local search (hill-climbing).
-
-        For each user, iteratively swap the worst selected item with the
-        best unselected item until no improvement is possible or max
-        iterations reached.
-
-        This is the 'greedy meme' from the paper - maximizes objective.
-        """
-        improved = individual.copy()
-
-        for u in range(self.n_users):
-            for _ in range(self.local_search_iters):
-                selected = np.where(improved[u] == 1)[0]
-                unselected = np.where(improved[u] == 0)[0]
-
-                if len(selected) == 0 or len(unselected) == 0:
-                    break
-
-                # Find worst selected (lowest score)
-                selected_scores = self.scores_matrix[u, selected]
-                worst_idx = selected[np.argmin(selected_scores)]
-                worst_score = self.scores_matrix[u, worst_idx]
-
-                # Find best unselected (highest score)
-                unselected_scores = self.scores_matrix[u, unselected]
-                best_idx = unselected[np.argmax(unselected_scores)]
-                best_score = self.scores_matrix[u, best_idx]
-
-                # Only swap if it improves the objective
-                if best_score > worst_score:
-                    improved[u, worst_idx] = 0
-                    improved[u, best_idx] = 1
-                else:
-                    # No more improvement possible for this user
-                    break
-
-        return improved
-
-    def _local_search_fairness(
-        self, individual: np.ndarray, bias_dir: float
-    ) -> np.ndarray:
-        """
-        Fairness-focused local search (constraint repair).
-
-        Adjusts selections to reduce UGF gap between groups:
-        - If G1 > G2 (bias > 0): Suppress G1 users, boost G2 users
-        - If G2 > G1 (bias < 0): Suppress G2 users, boost G1 users
-
-        'Suppress' = swap good items for worse ones (reduce group metric)
-        'Boost' = swap bad items for better ones (increase group metric)
-
-        This is a specialized meme for constrained optimization.
-        """
-        improved = individual.copy()
-
-        for u in range(self.n_users):
-            selected = np.where(improved[u] == 1)[0]
-            unselected = np.where(improved[u] == 0)[0]
-
-            if len(selected) == 0 or len(unselected) == 0:
-                continue
-
-            is_g1 = self.g1_mask[u]
-            is_g2 = self.g2_mask[u]
-
-            # Determine user's role in rebalancing
-            # bias_dir > 0 means G1 is advantaged
-            if bias_dir > 0:
-                if is_g1:
-                    strategy = "suppress"  # Lower G1's advantage
-                elif is_g2:
-                    strategy = "boost"  # Raise G2 to match
-                else:
-                    continue  # User not in either group
-            else:
-                if is_g1:
-                    strategy = "boost"  # Raise G1 to match
-                elif is_g2:
-                    strategy = "suppress"  # Lower G2's advantage
-                else:
-                    continue
-
-            # Apply local search iterations
-            for _ in range(self.local_search_iters):
-                selected = np.where(improved[u] == 1)[0]
-                unselected = np.where(improved[u] == 0)[0]
-
-                if len(selected) == 0 or len(unselected) == 0:
-                    break
-
-                if strategy == "boost":
-                    # Swap worst selected for best unselected
-                    selected_scores = self.scores_matrix[u, selected]
-                    worst_idx = selected[np.argmin(selected_scores)]
-
-                    unselected_scores = self.scores_matrix[u, unselected]
-                    best_idx = unselected[np.argmax(unselected_scores)]
-
-                    # Only swap if improvement exists
-                    if (
-                        self.scores_matrix[u, best_idx]
-                        > self.scores_matrix[u, worst_idx]
-                    ):
-                        improved[u, worst_idx] = 0
-                        improved[u, best_idx] = 1
-                    else:
-                        break
-
-                else:  # suppress
-                    # Swap best selected for worst unselected
-                    # (sacrifice quality to lower metric)
-                    selected_scores = self.scores_matrix[u, selected]
-                    best_selected_idx = selected[np.argmax(selected_scores)]
-
-                    unselected_scores = self.scores_matrix[u, unselected]
-                    worst_unselected_idx = unselected[np.argmin(unselected_scores)]
-
-                    # Always apply for constraint repair
-                    improved[u, best_selected_idx] = 0
-                    improved[u, worst_unselected_idx] = 1
-
-        return improved
 
     def _tournament_selection(
         self,
@@ -791,21 +477,14 @@ class GAOptimizer:
         }
 
     def train(self) -> Dict:
-        """Run Memetic Algorithm optimization with vectorized operations."""
+        """Run GA optimization with vectorized operations."""
         self.logger.info(
-            f"Memetic Algorithm | Model:{self.model_name} | Dataset:{self.dataset_name} | "
+            f"GA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
             f"Group:{self.group_name} | K={self.k} | Fairness_metric={self.fairness_metric}"
         )
         self.logger.info(
             f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
             f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
-        )
-        self.logger.info(
-            f"Local Search | Prob:{self.local_search_prob} | Iters:{self.local_search_iters}"
-        )
-        self.logger.info(
-            f"Adaptive Rates | Mutation:{self.mutation_rate:.2f}->{self.mutation_rate_min:.2f} | "
-            f"Crossover:{self.crossover_rate:.2f}->{self.crossover_rate_min:.2f}"
         )
 
         # Print original metrics (overall and per group)
@@ -871,7 +550,7 @@ class GAOptimizer:
         print(f"  Target epsilon: {self.epsilon:.4f}")
 
         # Initialize population
-        print("\nStarting Memetic Algorithm optimization (GA + Local Search)...")
+        print("\nStarting GA optimization (vectorized)...")
         start_time = time.time()
 
         # Create initial population: greedy + perturbed greedy
@@ -932,11 +611,8 @@ class GAOptimizer:
                 population, objectives, violations, n_pairs
             )
 
-            # Crossover (with adaptive rate)
-            current_mutation, current_crossover = self._get_adaptive_rates(progress)
-            children1, children2 = self._crossover_batch(
-                parents1, parents2, crossover_rate=current_crossover
-            )
+            # Crossover
+            children1, children2 = self._crossover_batch(parents1, parents2)
             offspring = np.concatenate([children1, children2], axis=0)[:n_offspring]
 
             # Mutation
@@ -945,14 +621,8 @@ class GAOptimizer:
             # A positive mean means G1 is generally advantaged -> Suppress G1, Boost G2
             avg_bias = np.mean(signed_ugf)
 
-            # Mutation with Repair Bias and adaptive rate
-            offspring = self._mutate_batch(
-                offspring, bias_dir=avg_bias, mutation_rate=current_mutation
-            )
-
-            # Local Search (Lamarckian Learning) - transforms GA into Memetic Algorithm
-            # Apply local refinement to offspring before adding to population
-            offspring = self._local_search_batch(offspring, signed_ugf)
+            # Mutation with Repair Bias
+            offspring = self._mutate_batch(offspring, bias_dir=avg_bias)
 
             # New population
             population = np.concatenate([elites, offspring], axis=0)
@@ -990,15 +660,12 @@ class GAOptimizer:
             # Progress logging
             print(
                 f"  Gen {gen + 1}: eps={current_epsilon:.4f}, best_obj={gen_best_fitness:.2f}, "
-                f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}, "
-                f"mut={current_mutation:.3f}, cross={current_crossover:.2f}"
+                f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
             )
 
         cpu_time = time.time() - start_time
-        print(f"\nMemetic Algorithm completed in {cpu_time:.2f} seconds")
-        print(f"Meme selection probs: {self.meme_pool.get_stats()}")
+        print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
         self.logger.info(f"CPU time: {cpu_time:.2f} seconds")
-        self.logger.info(f"Final meme probabilities: {self.meme_pool.get_stats()}")
 
         # Use feasible solution if available (Priority 1)
         if best_feasible_solution is not None:
@@ -1093,7 +760,7 @@ if __name__ == "__main__":
 
     # Configuration
     dataset_folder = "../dataset"
-    dataset_name = "5Beauty-rand"
+    dataset_name = "5Grocery-rand"
     model_name = "NCF"
     group_name = "0.05_count"
 
@@ -1125,6 +792,7 @@ if __name__ == "__main__":
         data_loader=dl,
         k=10,
         eval_metric_list=["ndcg@10", "f1@10"],
+        fairness_metric="f1",
         epsilon="auto",
         logger=logger,
         model_name=model_name,

@@ -16,6 +16,7 @@ class UGF(object):
         logger=None,
         model_name="",
         group_name="",
+        solver="SCIP",  # Default to SCIP
     ):
         """
         Train fairness model
@@ -26,6 +27,7 @@ class UGF(object):
         :param epsilon: the upper bound for difference between groups.
                         Use 'auto' to calculate as half of original UGF gap (paper methodology)
         :param logger: logger for logging info
+        :param solver: Solver to use ('SCIP' or 'Highs'), default='SCIP'
         """
         self.data_loader = data_loader
         self.dataset_name = data_loader.path.split("/")[-1]
@@ -36,6 +38,7 @@ class UGF(object):
         self.epsilon = None  # Will be set in train() if 'auto'
         self.model_name = model_name
         self.group_name = group_name
+        self.solver_name = solver
         if logger is None:
             self.logger = create_logger()
         else:
@@ -252,9 +255,17 @@ class UGF(object):
         # Optimize model with timing
         import time
 
-        print("Solving optimization problem with PuLP (SCIP solver)...")
+        print(f"Solving optimization problem with PuLP ({self.solver_name} solver)...")
         start_time = time.time()
-        prob.solve(pulp.SCIP_CMD(msg=1))
+
+        if self.solver_name.lower() == "scip":
+            prob.solve(pulp.SCIP_CMD(msg=1))
+        elif self.solver_name.lower() == "highs":
+            prob.solve(pulp.HiGHS_CMD(msg=1))
+        else:
+            print(f"Warning: Unknown solver '{self.solver_name}', defaulting to SCIP")
+            prob.solve(pulp.SCIP_CMD(msg=1))
+
         end_time = time.time()
         cpu_time = end_time - start_time
 
@@ -433,6 +444,7 @@ if __name__ == "__main__":
                         logger=logger,
                         model_name=model_name,
                         group_name=group_name,
+                        solver="SCIP",
                     )
 
                     # Get before/after results

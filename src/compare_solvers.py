@@ -1,7 +1,7 @@
 """
 MILP vs GA Solver Comparison Script.
 
-Runs both the MILP solver (PuLP/HiGHS) and GA optimizer on the same dataset
+Runs both the MILP solver (PuLP/SCIP) and GA optimizer on the same dataset
 and compares their results in terms of:
 - Solution quality (F1@10, NDCG@10)
 - Fairness (UGF gap)
@@ -28,6 +28,7 @@ def run_comparison(
     group_name: str,
     dataset_folder: str = "../dataset",
     results_folder: str = "../results/comparison",
+    solver: str = "SCIP",
 ):
     """
     Run comparison between MILP and GA solvers.
@@ -68,9 +69,13 @@ def run_comparison(
 
     print("=" * 80)
     print("MILP vs GA Comparison")
-    print(f"Dataset: {dataset_name} | Model: {model_name} | Grouping: {group_name}")
+    print(
+        f"Dataset: {dataset_name} | Model: {model_name} | Grouping: {group_name} | Solver: {solver}"
+    )
     print("=" * 80)
-    logger.info(f"Comparison: {dataset_name} | {model_name} | {group_name}")
+    logger.info(
+        f"Comparison: {dataset_name} | {model_name} | {group_name} | Solver: {solver}"
+    )
 
     # Load data
     print("\nLoading data...")
@@ -91,10 +96,10 @@ def run_comparison(
     # Run MILP Optimizer
     # ========================================
     print("\n" + "-" * 40)
-    print("Running MILP Optimizer (PuLP/HiGHS)...")
+    print(f"Running MILP Optimizer (PuLP/{solver})...")
     print("-" * 40)
     logger.info("=" * 40)
-    logger.info("MILP Optimizer")
+    logger.info(f"MILP Optimizer ({solver})")
     logger.info("=" * 40)
 
     milp_logger = create_logger(
@@ -114,6 +119,7 @@ def run_comparison(
         logger=milp_logger,
         model_name=model_name,
         group_name=group_name,
+        solver=solver,
     )
     milp_results = milp_optimizer.train()
     milp_time = time.time() - milp_start
@@ -149,19 +155,19 @@ def run_comparison(
     ga_start = time.time()
     ga_optimizer = GAOptimizer(
         data_loader=dl_ga,
-        k=k,
-        eval_metric_list=metrics_list,
+        k=10,
+        eval_metric_list=["ndcg@10", "f1@10"],
         fairness_metric="f1",
         epsilon="auto",
         logger=ga_logger,
         model_name=model_name,
         group_name=group_name,
         population_size=50,
-        generations=200,
+        generations=50,
         mutation_rate=0.1,
         crossover_rate=0.8,
         elitism_count=5,
-        penalty_lambda=None,  # Not used with stiffness penalty
+        penalty_lambda=None,
         seed=42,
     )
     ga_results = ga_optimizer.train()
@@ -234,7 +240,7 @@ def run_comparison(
 
 if __name__ == "__main__":
     # Configuration
-    DATASETS = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
+    DATASETS = ["5Grocery-rand"]
     MODELS = ["NCF", "biasedMF"]
     GROUPS = ["0.05_count", "sum_0.05", "max_0.05"]
 
@@ -245,6 +251,7 @@ if __name__ == "__main__":
             dataset_name=sys.argv[1],
             model_name=sys.argv[2],
             group_name=sys.argv[3],
+            solver=sys.argv[4] if len(sys.argv) > 4 else "SCIP",
         )
     else:
         # Run batch over all combinations
