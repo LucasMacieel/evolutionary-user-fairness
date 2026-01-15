@@ -1,0 +1,14 @@
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:50 | Gen:50 | Mut:0.1 | Cross:0.8
+Before optimization overall scores           : ndcg@10=0.4508 f1@10=0.1578
+Before optimization group 1 (active) scores  : ndcg@10=0.7029 f1@10=0.3648
+Before optimization group 2 (inactive) scores: ndcg@10=0.4274 f1@10=0.1386
+Before optimization UGF (f1@10): 0.2262 (22.62%)
+Epsilon: 0.1131
+CPU time: 54.19 seconds
+After optimization overall metric scores     : ndcg@10=0.4380 f1@10=0.1441
+After optimization group 1 (active) scores   : ndcg@10=0.6125 f1@10=0.2598
+After optimization group 2 (inactive) scores : ndcg@10=0.4219 f1@10=0.1334
+After optimization UGF: 0.1131
+UGF reduction: 0.1131 (50.0%)
+Constraint satisfied: True

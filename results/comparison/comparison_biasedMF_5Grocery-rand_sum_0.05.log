@@ -1,0 +1,18 @@
+Comparison: 5Grocery-rand | biasedMF | sum_0.05 | Solver: SCIP
+========================================
+MILP Optimizer (SCIP)
+========================================
+MILP CPU time: 416.54s
+========================================
+GA Optimizer
+========================================
+GA CPU time: 92.62s
+
+Comparison Summary:
+              Metric   MILP     GA
+        CPU Time (s) 416.54  92.62
+           Final UGF 0.0986 0.0974
+   NDCG@10 (Overall) 0.4558 0.4353
+     F1@10 (Overall) 0.1599 0.1433
+Constraint Satisfied     No    Yes
+Speedup: 4.50x

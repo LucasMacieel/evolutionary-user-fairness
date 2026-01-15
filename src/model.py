@@ -256,7 +256,7 @@ class UGF(object):
         import time
 
         print(f"Solving optimization problem with PuLP ({self.solver_name} solver)...")
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         if self.solver_name.lower() == "scip":
             prob.solve(pulp.SCIP_CMD(msg=1))
@@ -266,7 +266,7 @@ class UGF(object):
             print(f"Warning: Unknown solver '{self.solver_name}', defaulting to SCIP")
             prob.solve(pulp.SCIP_CMD(msg=1))
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         cpu_time = end_time - start_time
 
         print(f"\nStatus: {pulp.LpStatus[prob.status]}")

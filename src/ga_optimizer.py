@@ -551,7 +551,7 @@ class GAOptimizer:
 
         # Initialize population
         print("\nStarting GA optimization (vectorized)...")
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Create initial population: greedy + perturbed greedy
         population = self._create_initial_population(self.population_size)
@@ -663,7 +663,7 @@ class GAOptimizer:
                 f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
             )
 
-        cpu_time = time.time() - start_time
+        cpu_time = time.perf_counter() - start_time
         print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
         self.logger.info(f"CPU time: {cpu_time:.2f} seconds")
 

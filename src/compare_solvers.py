@@ -109,7 +109,7 @@ def run_comparison(
         ),
     )
 
-    milp_start = time.time()
+    milp_start = time.perf_counter()
     milp_optimizer = MILPOptimizer(
         data_loader=dl,
         k=k,
@@ -122,7 +122,7 @@ def run_comparison(
         solver=solver,
     )
     milp_results = milp_optimizer.train()
-    milp_time = time.time() - milp_start
+    milp_time = time.perf_counter() - milp_start
 
     print(f"MILP completed in {milp_time:.2f} seconds")
     logger.info(f"MILP CPU time: {milp_time:.2f}s")
@@ -152,7 +152,7 @@ def run_comparison(
         ),
     )
 
-    ga_start = time.time()
+    ga_start = time.perf_counter()
     ga_optimizer = GAOptimizer(
         data_loader=dl_ga,
         k=10,
@@ -171,7 +171,7 @@ def run_comparison(
         seed=42,
     )
     ga_results = ga_optimizer.train()
-    ga_time = time.time() - ga_start
+    ga_time = time.perf_counter() - ga_start
 
     print(f"GA completed in {ga_time:.2f} seconds")
     logger.info(f"GA CPU time: {ga_time:.2f}s")
