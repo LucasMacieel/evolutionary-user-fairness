@@ -82,8 +82,8 @@ class UGF(object):
 
                 for i in range(len(item_list)):
                     var_name = (
-                        str(uid) + "_" + str(item_list[i])
-                    )  # variable name is "uid_iid"
+                        "x" + str(uid) + "_" + str(item_list[i])
+                    )  # variable name is "x{uid}_{iid}"
                     v = pulp.LpVariable(var_name, cat="Binary")
                     all_vars[var_name] = v
                     tmp_var_list.append(v)
@@ -125,7 +125,7 @@ class UGF(object):
         results = []
         for var_name, v in all_vars.items():
             v_s = var_name.split("_")
-            uid = int(v_s[0])
+            uid = int(v_s[0][1:])  # remove 'x' prefix
             iid = int(v_s[1])
             results.append({"uid": uid, "iid": iid, "q_new": int(pulp.value(v))})
 
@@ -184,13 +184,12 @@ class UGF(object):
 
         # Print original evaluation results
         self.logger.info(
-            "Model:{} | Dataset:{} | Group:{} |  Epsilon={} | K={} | Fairness_metric={}".format(
+            "Model:{} | Dataset:{} | Group:{} |  Epsilon={} | K={}".format(
                 self.model_name,
                 self.dataset_name,
                 self.group_name,
                 self.epsilon,
                 self.k,
-                self.fairness_metric,
             )
         )
         self._print_metrics(
@@ -222,8 +221,9 @@ class UGF(object):
         )
 
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
+        # Calculate epsilon dynamically if set to 'auto' (paper methodology)
         if self._epsilon_input == "auto":
-            self.epsilon = original_ugf / 4  # One quarter of original UGF gap
+            self.epsilon = original_ugf / 2  # Half of original UGF gap
             print("\nDynamic epsilon calculation (paper methodology):")
             print(
                 f"  Original UGF gap ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
@@ -252,9 +252,9 @@ class UGF(object):
         # Optimize model with timing
         import time
 
-        print("Solving optimization problem with PuLP (HiGHS solver)...")
+        print("Solving optimization problem with PuLP (SCIP solver)...")
         start_time = time.time()
-        prob.solve(pulp.HiGHS_CMD(msg=1))
+        prob.solve(pulp.SCIP_CMD(msg=1))
         end_time = time.time()
         cpu_time = end_time - start_time
 
