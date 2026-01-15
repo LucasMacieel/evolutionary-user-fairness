@@ -240,7 +240,7 @@ def run_comparison(
 
 if __name__ == "__main__":
     # Configuration
-    DATASETS = ["5Grocery-rand"]
+    DATASETS = ["5Beauty-rand"]
     MODELS = ["NCF", "biasedMF"]
     GROUPS = ["0.05_count", "sum_0.05", "max_0.05"]
 

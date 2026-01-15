@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+    \centering
+    \caption{MILP vs GA Comparison Results}
+    \label{tab:comparison}
+    \begin{tabular}{llccccc}
+        \hline
+            Model & Group & MILP Time & GA Time & Speedup & MILP NDCG & GA NDCG \\
+        \hline
+            NCF & 0.05_count & 1499.2s & 162.7s & 9.21x & 0.3584 & 0.3364 \\
+            NCF & sum_0.05 & 411.4s & 161.6s & 2.55x & 0.3588 & 0.3386 \\
+            NCF & max_0.05 & 732.2s & 161.0s & 4.55x & 0.3525 & 0.3419 \\
+            biasedMF & 0.05_count & 1028.5s & 161.8s & 6.36x & 0.4393 & 0.4170 \\
+            biasedMF & sum_0.05 & 870.8s & 160.7s & 5.42x & 0.4377 & 0.4201 \\
+            biasedMF & max_0.05 & 718.5s & 162.6s & 4.42x & 0.4336 & 0.4243 \\
+            NCF & 0.05_count & 354.5s & 92.0s & 3.85x & 0.3969 & 0.3763 \\
+            NCF & sum_0.05 & 349.8s & 92.8s & 3.77x & 0.3926 & 0.3751 \\
+            NCF & max_0.05 & 170.1s & 92.4s & 1.84x & 0.3899 & 0.3815 \\
+            biasedMF & 0.05_count & 363.8s & 92.7s & 3.92x & 0.4580 & 0.4380 \\
+            biasedMF & sum_0.05 & 416.5s & 92.6s & 4.50x & 0.4558 & 0.4353 \\
+            biasedMF & max_0.05 & 320.0s & 92.5s & 3.46x & 0.4508 & 0.4418 \\
+        \hline
+    \end{tabular}
+\end{table}

@@ -1,0 +1,14 @@
+GA Optimizer | Model:NCF | Dataset:dataset\5Beauty-rand | Group:max_0.05 | K=10 | Fairness_metric=f1
+GA Parameters | Pop:50 | Gen:50 | Mut:0.1 | Cross:0.8
+Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244
+Before optimization group 1 (active) scores  : ndcg@10=0.4692 f1@10=0.2036
+Before optimization group 2 (inactive) scores: ndcg@10=0.3443 f1@10=0.1197
+Before optimization UGF (f1@10): 0.0839 (8.39%)
+Epsilon: 0.0419
+CPU time: 75.73 seconds
+After optimization overall metric scores     : ndcg@10=0.3419 f1@10=0.1171
+After optimization group 1 (active) scores   : ndcg@10=0.4076 f1@10=0.1567
+After optimization group 2 (inactive) scores : ndcg@10=0.3386 f1@10=0.1151
+After optimization UGF: 0.0418
+UGF reduction: 0.0421 (50.2%)
+Constraint satisfied: True
