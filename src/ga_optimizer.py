@@ -35,14 +35,21 @@ class GAOptimizer:
         logger=None,
         model_name: str = "",
         group_name: str = "",
-        # GA parameters
-        population_size: int = 50,
+        # GA parameters (optimized via Optuna hyperparameter tuning)
+        population_size: int = 20,
         generations: int = 50,
-        mutation_rate: float = 0.1,
-        crossover_rate: float = 0.8,
-        elitism_count: int = 5,
+        mutation_rate: float = 0.24,
+        crossover_rate: float = 0.55,
+        elitism_count: int = 10,
         penalty_lambda: float = None,
         seed: int = None,
+        # Adaptive penalty parameters (Bean & Hadj-Alouane method)
+        adaptive_penalty: bool = True,
+        penalty_beta1: float = 1.5,  # Tightening factor when all feasible
+        penalty_beta2: float = 1.5,  # Relaxation factor when all infeasible
+        penalty_history_k: int = 5,  # Lookback window for feasibility history
+        # Early stopping parameters
+        early_stopping: bool = True,  # Halt immediately when feasible solution found
     ):
         """Initialize GA optimizer with vectorized data structures."""
         self.data_loader = data_loader
@@ -64,6 +71,13 @@ class GAOptimizer:
         self.elitism_count = elitism_count
         self._penalty_lambda_input = penalty_lambda
         self.penalty_lambda = None
+
+        # Adaptive penalty settings
+        self.adaptive_penalty = adaptive_penalty
+        self.penalty_beta1 = penalty_beta1
+        self.penalty_beta2 = penalty_beta2
+        self.penalty_history_k = penalty_history_k
+        self.early_stopping = early_stopping
 
         if seed is not None:
             random.seed(seed)
@@ -486,6 +500,10 @@ class GAOptimizer:
             f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
             f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
         )
+        if self.adaptive_penalty:
+            self.logger.info(
+                f"Adaptive Penalty | beta1:{self.penalty_beta1} | beta2:{self.penalty_beta2} | k:{self.penalty_history_k}"
+            )
 
         # Print original metrics (overall and per group)
         print("=" * 70)
@@ -586,13 +604,33 @@ class GAOptimizer:
         best_feasible_solution = None
         best_feasible_fitness = float("-inf")
 
+        # Adaptive penalty: track feasibility history of best individual per generation
+        feasibility_history = []  # True if best individual was feasible, False otherwise
+
+        # Pure Adaptive Penalty (Bean & Hadj-Alouane method)
+        # Start at the loose constraint and adapt purely based on feasibility feedback
+        current_epsilon = start_epsilon
+
         # Evolution loop
         for gen in range(self.generations):
-            # Progressive constraint tightening
-            progress = gen / max(1, self.generations - 1)
-            current_epsilon = (
-                start_epsilon + (target_epsilon - start_epsilon) * progress
-            )
+            # Adaptive penalty adjustment (Bean & Hadj-Alouane method)
+            # No generation-based schedule - purely feedback-driven
+            if (
+                self.adaptive_penalty
+                and len(feasibility_history) >= self.penalty_history_k
+            ):
+                recent_history = feasibility_history[-self.penalty_history_k :]
+                if all(recent_history):  # All recent best were feasible
+                    # Tighten epsilon (make constraint harder, push toward target)
+                    current_epsilon = current_epsilon / self.penalty_beta1
+                elif not any(recent_history):  # All recent best were infeasible
+                    # Relax epsilon (make constraint easier to satisfy)
+                    current_epsilon = current_epsilon * self.penalty_beta2
+
+                # Bound epsilon to valid range
+                current_epsilon = max(
+                    target_epsilon, min(current_epsilon, start_epsilon)
+                )
 
             # Elitism: keep top individuals
             # Use same Deb's sort logic
@@ -638,6 +676,10 @@ class GAOptimizer:
             gen_best_ugf = ugf_gaps[gen_best_idx]
             gen_best_viol = violations[gen_best_idx]
 
+            # Update feasibility history for adaptive penalty
+            gen_best_is_feasible = gen_best_viol <= 1e-9
+            feasibility_history.append(gen_best_is_feasible)
+
             if gen_best_fitness > best_fitness:
                 best_solution = population[gen_best_idx].copy()
                 best_fitness = gen_best_fitness
@@ -658,10 +700,32 @@ class GAOptimizer:
                     ].copy()
 
             # Progress logging
-            print(
-                f"  Gen {gen + 1}: eps={current_epsilon:.4f}, best_obj={gen_best_fitness:.2f}, "
-                f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
-            )
+            if (gen + 1) % 10 == 0:
+                adapt_status = ""
+                if (
+                    self.adaptive_penalty
+                    and len(feasibility_history) >= self.penalty_history_k
+                ):
+                    recent = feasibility_history[-self.penalty_history_k :]
+                    if all(recent):
+                        adapt_status = " [RELAX]"
+                    elif not any(recent):
+                        adapt_status = " [TIGHT]"
+                print(
+                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, best_obj={gen_best_fitness:.2f}, "
+                    f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
+                )
+
+            # Early stopping check
+            if self.early_stopping and best_feasible_solution is not None:
+                print(
+                    f"\n  *** Early stop at gen {gen + 1}: feasible solution found "
+                    f"(UGF={gen_best_ugf:.4f} <= target={target_epsilon:.4f}) ***"
+                )
+                self.logger.info(
+                    f"Early stop at generation {gen + 1}: first feasible solution found"
+                )
+                break
 
         cpu_time = time.perf_counter() - start_time
         print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
@@ -766,10 +830,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Health-rand"]
+    datasets = ["5Grocery-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["NCF"]
+    models = ["biasedMF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [
@@ -790,12 +854,6 @@ if __name__ == "__main__":
         ),
     ]
 
-    # GA parameters
-    ga_population_size = 50
-    ga_generations = 50
-    ga_mutation_rate = 0.1
-    ga_crossover_rate = 0.8
-    ga_elitism_count = 5
     ga_seed = 42
 
     metrics = ["ndcg", "f1"]
@@ -864,11 +922,6 @@ if __name__ == "__main__":
                         logger=logger,
                         model_name=model_name,
                         group_name=group_name,
-                        population_size=ga_population_size,
-                        generations=ga_generations,
-                        mutation_rate=ga_mutation_rate,
-                        crossover_rate=ga_crossover_rate,
-                        elitism_count=ga_elitism_count,
                         seed=ga_seed,
                     )
 
