@@ -50,6 +50,9 @@ class GAOptimizer:
         penalty_history_k: int = 5,  # Lookback window for feasibility history
         # Early stopping parameters
         early_stopping: bool = True,  # Halt immediately when feasible solution found
+        # Non-uniform mutation parameters (Michalewicz paper Section 2.1)
+        mutation_rate_min: float = 0.05,  # Minimum mutation rate at end
+        mutation_decay_b: float = 2.0,  # Non-uniformity degree (higher = faster decay)
     ):
         """Initialize GA optimizer with vectorized data structures."""
         self.data_loader = data_loader
@@ -78,6 +81,8 @@ class GAOptimizer:
         self.penalty_beta2 = penalty_beta2
         self.penalty_history_k = penalty_history_k
         self.early_stopping = early_stopping
+        self.mutation_rate_min = mutation_rate_min
+        self.mutation_decay_b = mutation_decay_b
 
         if seed is not None:
             random.seed(seed)
@@ -281,8 +286,27 @@ class GAOptimizer:
 
         return children1, children2
 
+    def _get_mutation_rate(self, gen: int) -> float:
+        """
+        Non-uniform mutation rate decay (Michalewicz paper Section 2.1).
+
+        rate(t) = rate_max - (rate_max - rate_min) * (t/T)^b
+
+        - Early: high mutation rate (broad exploration)
+        - Late: low mutation rate (local refinement)
+        """
+        if self.generations <= 1:
+            return self.mutation_rate
+
+        progress = gen / (self.generations - 1)  # 0 to 1
+        decay = progress**self.mutation_decay_b
+        current_rate = (
+            self.mutation_rate - (self.mutation_rate - self.mutation_rate_min) * decay
+        )
+        return current_rate
+
     def _mutate_batch(
-        self, population: np.ndarray, bias_dir: float = 0.0
+        self, population: np.ndarray, bias_dir: float = 0.0, current_rate: float = None
     ) -> np.ndarray:
         """
         Smart Swap Mutation with Repair Bias.
@@ -296,8 +320,11 @@ class GAOptimizer:
         pop_size = population.shape[0]
         mutated = population.copy()
 
+        # Use provided rate or default instance rate
+        rate = current_rate if current_rate is not None else self.mutation_rate
+
         # Decide which users to mutate for each individual
-        mutate_mask = np.random.random((pop_size, self.n_users)) < self.mutation_rate
+        mutate_mask = np.random.random((pop_size, self.n_users)) < rate
 
         # Repair logic thresholds
         apply_repair = abs(bias_dir) > (self.epsilon if self.epsilon else 0.05)
@@ -653,14 +680,19 @@ class GAOptimizer:
             children1, children2 = self._crossover_batch(parents1, parents2)
             offspring = np.concatenate([children1, children2], axis=0)[:n_offspring]
 
-            # Mutation
+            # Mutation with non-uniform decay and Repair Bias
             # Determine current bias direction from population average
             # (Use previous generation's evaluation to guide mutation)
             # A positive mean means G1 is generally advantaged -> Suppress G1, Boost G2
             avg_bias = np.mean(signed_ugf)
 
+            # Get decayed mutation rate (high early, low late)
+            current_mutation_rate = self._get_mutation_rate(gen)
+
             # Mutation with Repair Bias
-            offspring = self._mutate_batch(offspring, bias_dir=avg_bias)
+            offspring = self._mutate_batch(
+                offspring, bias_dir=avg_bias, current_rate=current_mutation_rate
+            )
 
             # New population
             population = np.concatenate([elites, offspring], axis=0)
@@ -712,8 +744,8 @@ class GAOptimizer:
                     elif not any(recent):
                         adapt_status = " [TIGHT]"
                 print(
-                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, best_obj={gen_best_fitness:.2f}, "
-                    f"UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
+                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, mut={current_mutation_rate:.3f}, "
+                    f"best_obj={gen_best_fitness:.2f}, UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
                 )
 
             # Early stopping check
