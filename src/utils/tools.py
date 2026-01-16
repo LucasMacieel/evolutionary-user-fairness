@@ -1,6 +1,5 @@
 import logging
-import numpy as np
-from utils.rank_metrics import ndcg_at_k, precision_at_k
+from utils.rank_metrics import ndcg_at_k
 
 
 def create_logger(name="result_logger", path="results.log"):
@@ -21,7 +20,7 @@ def create_logger(name="result_logger", path="results.log"):
 
 def evaluation_methods(df, metrics):
     """
-    Generate evaluation scores
+    Generate evaluation scores (vectorized version).
     :param df:
     :param metrics:
     :return:
@@ -29,42 +28,56 @@ def evaluation_methods(df, metrics):
     evaluations = []
     data_df = df.copy(deep=True)
     data_df["q*s"] = data_df["q"] * data_df["score"]
+
+    # Pre-sort once for all metrics
+    tmp_df = data_df.sort_values(by="q*s", ascending=False, ignore_index=True)
+
+    # Add row number within each user group (for top-k selection)
+    tmp_df["rank_in_group"] = tmp_df.groupby("uid").cumcount()
+
     for metric in metrics:
         k = int(metric.split("@")[-1])
-        tmp_df = data_df.sort_values(by="q*s", ascending=False, ignore_index=True)
-        df_group = tmp_df.groupby("uid")
+
+        # Filter to top-k per user
+        top_k_df = tmp_df[tmp_df["rank_in_group"] < k]
+
         if metric.startswith("ndcg@"):
-            ndcgs = []
-            for uid, group in df_group:
-                ndcgs.append(ndcg_at_k(group["label"].tolist()[:k], k=k, method=1))
-            evaluations.append(np.average(ndcgs))
+            # Vectorized NDCG calculation
+            def calc_ndcg(group):
+                labels = group["label"].values[:k]
+                return ndcg_at_k(labels.tolist(), k=k, method=1)
+
+            ndcg_series = top_k_df.groupby("uid").apply(calc_ndcg, include_groups=False)
+            evaluations.append(ndcg_series.mean())
+
         elif metric.startswith("hit@"):
-            hits = []
-            for uid, group in df_group:
-                hits.append(int(np.sum(group["label"][:k]) > 0))
-            evaluations.append(np.average(hits))
+            # Vectorized hit calculation: any label > 0 in top-k
+            hits = top_k_df.groupby("uid")["label"].sum() > 0
+            evaluations.append(hits.mean())
+
         elif metric.startswith("precision@"):
-            precisions = []
-            for uid, group in df_group:
-                if len(group["label"].tolist()) < k:
-                    print(group)
-                    print(uid)
-                precisions.append(precision_at_k(group["label"].tolist()[:k], k=k))
-            evaluations.append(np.average(precisions))
+            # Vectorized precision: sum of labels in top-k / k
+            precisions = top_k_df.groupby("uid")["label"].sum() / k
+            evaluations.append(precisions.mean())
+
         elif metric.startswith("recall@"):
-            recalls = []
-            for uid, group in df_group:
-                if np.sum(group["label"]) == 0:
-                    continue
-                recalls.append(
-                    1.0 * np.sum(group["label"][:k]) / np.sum(group["label"])
-                )
-            evaluations.append(np.average(recalls))
+            # Vectorized recall: need total labels per user
+            top_k_labels = top_k_df.groupby("uid")["label"].sum()
+            total_labels = tmp_df.groupby("uid")["label"].sum()
+
+            # Filter users with at least one relevant item
+            valid_mask = total_labels > 0
+            recalls = top_k_labels[valid_mask] / total_labels[valid_mask]
+            evaluations.append(recalls.mean())
+
         elif metric.startswith("f1@"):
-            f1 = []
-            for uid, group in df_group:
-                if np.sum(group["label"]) == 0:
-                    continue
-                f1.append(2 * np.sum(group["label"][:k]) / (np.sum(group["label"]) + k))
-            evaluations.append(np.average(f1))
+            # Vectorized F1: 2 * hits_in_top_k / (total_relevant + k)
+            top_k_labels = top_k_df.groupby("uid")["label"].sum()
+            total_labels = tmp_df.groupby("uid")["label"].sum()
+
+            # Filter users with at least one relevant item
+            valid_mask = total_labels > 0
+            f1_scores = 2 * top_k_labels[valid_mask] / (total_labels[valid_mask] + k)
+            evaluations.append(f1_scores.mean())
+
     return evaluations

@@ -40,6 +40,7 @@ class GAOptimizer:
         generations: int = 50,
         mutation_rate: float = 0.24,
         crossover_rate: float = 0.55,
+        crossover_n_parents: int = 3,  # Number of parents for gene pool recombination
         elitism_count: int = 10,
         penalty_lambda: float = None,
         seed: int = None,
@@ -71,6 +72,7 @@ class GAOptimizer:
         self.generations = generations
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
+        self.crossover_n_parents = crossover_n_parents
         self.elitism_count = elitism_count
         self._penalty_lambda_input = penalty_lambda
         self.penalty_lambda = None
@@ -129,6 +131,10 @@ class GAOptimizer:
         # Group masks: boolean arrays indicating group membership
         g1_users = set(self.g1_df["uid"].unique())
         g2_users = set(self.g2_df["uid"].unique())
+
+        # Cache group sets for fast isin() lookups in _evaluate_groups
+        self._g1_user_set = g1_users
+        self._g2_user_set = g2_users
 
         self.g1_mask = np.array([uid in g1_users for uid in self.user_ids])
         self.g2_mask = np.array([uid in g2_users for uid in self.user_ids])
@@ -260,31 +266,48 @@ class GAOptimizer:
 
         return individual
 
-    def _crossover_batch(
-        self, parents1: np.ndarray, parents2: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    def _multi_parent_crossover(
+        self,
+        population: np.ndarray,
+        objectives: np.ndarray,
+        violations: np.ndarray,
+        n_offspring: int,
+    ) -> np.ndarray:
         """
-        Uniform crossover at user level for batch of parents.
+        Multi-parent crossover using gene pool recombination (Michalewicz paper Section 2.2).
 
-        Args:
-            parents1, parents2: shape (batch_size, n_users, n_items)
+        For each offspring, select n_parents from the population via tournament selection.
+        For each user position, randomly pick from one of the n_parents.
 
         Returns:
-            children1, children2: same shape
+            offspring: shape (n_offspring, n_users, n_items)
         """
-        batch_size = parents1.shape[0]
+        offspring = np.zeros((n_offspring, self.n_users, self.n_items), dtype=np.int8)
 
-        # Decide which users come from which parent
-        crossover_mask = np.random.random((batch_size, self.n_users, 1)) < 0.5
+        for i in range(n_offspring):
+            # Apply crossover with probability
+            if np.random.random() >= self.crossover_rate:
+                # No crossover - just copy a selected parent
+                parent = self._tournament_selection(
+                    population, objectives, violations, 1
+                )[0]
+                offspring[i] = parent
+                continue
 
-        # Apply crossover with probability
-        do_crossover = np.random.random(batch_size) < self.crossover_rate
-        do_crossover = do_crossover[:, np.newaxis, np.newaxis]
+            # Select n_parents for gene pool
+            parents = self._tournament_selection(
+                population, objectives, violations, self.crossover_n_parents
+            )
 
-        children1 = np.where(do_crossover & crossover_mask, parents2, parents1)
-        children2 = np.where(do_crossover & crossover_mask, parents1, parents2)
+            # For each user, randomly pick from one parent
+            parent_choices = np.random.randint(
+                0, self.crossover_n_parents, size=self.n_users
+            )
 
-        return children1, children2
+            for u in range(self.n_users):
+                offspring[i, u] = parents[parent_choices[u], u]
+
+        return offspring
 
     def _get_mutation_rate(self, gen: int) -> float:
         """
@@ -487,14 +510,15 @@ class GAOptimizer:
         return selected
 
     def _solution_to_dataframe(self, solution: np.ndarray) -> pd.DataFrame:
-        """Convert solution matrix to dataframe with 'q' column."""
+        """Convert solution matrix to dataframe with 'q' column (vectorized)."""
         df = self.all_df.copy()
-        df["q"] = 0
 
-        for uid in self.user_ids:
-            u_idx = self.user_id_to_idx[uid]
-            user_mask = df["uid"] == uid
-            df.loc[user_mask, "q"] = solution[u_idx, : user_mask.sum()]
+        # Vectorized: map each row to (user_idx, item_idx) and lookup in solution
+        user_indices = df["uid"].map(self.user_id_to_idx).values
+        item_indices = df.groupby("uid").cumcount().values
+
+        # Direct vectorized lookup
+        df["q"] = solution[user_indices, item_indices]
 
         return df
 
@@ -503,13 +527,12 @@ class GAOptimizer:
         Evaluate metrics for overall, group 1 (advantaged), and group 2 (disadvantaged).
         Returns dict with 'overall', 'g1', 'g2' keys.
         """
-        # Get group user sets
-        g1_users = set(self.g1_df["uid"].unique())
-        g2_users = set(self.g2_df["uid"].unique())
+        # Use pre-computed group sets (cached in __init__)
+        g1_mask = solution_df["uid"].isin(self._g1_user_set)
+        g2_mask = solution_df["uid"].isin(self._g2_user_set)
 
-        # Split solution_df by group
-        g1_df = solution_df[solution_df["uid"].isin(g1_users)]
-        g2_df = solution_df[solution_df["uid"].isin(g2_users)]
+        g1_df = solution_df[g1_mask]
+        g2_df = solution_df[g2_mask]
 
         return {
             "overall": evaluation_methods(solution_df, metrics),
@@ -665,20 +688,11 @@ class GAOptimizer:
             elite_indices = sorted_indices[: self.elitism_count]
             elites = population[elite_indices].copy()
 
-            # Selection
+            # Multi-parent crossover (gene pool recombination)
             n_offspring = self.population_size - self.elitism_count
-            n_pairs = (n_offspring + 1) // 2
-
-            parents1 = self._tournament_selection(
-                population, objectives, violations, n_pairs
+            offspring = self._multi_parent_crossover(
+                population, objectives, violations, n_offspring
             )
-            parents2 = self._tournament_selection(
-                population, objectives, violations, n_pairs
-            )
-
-            # Crossover
-            children1, children2 = self._crossover_batch(parents1, parents2)
-            offspring = np.concatenate([children1, children2], axis=0)[:n_offspring]
 
             # Mutation with non-uniform decay and Repair Bias
             # Determine current bias direction from population average
@@ -862,10 +876,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Grocery-rand"]
+    datasets = ["5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["biasedMF"]
+    models = ["NCF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [
