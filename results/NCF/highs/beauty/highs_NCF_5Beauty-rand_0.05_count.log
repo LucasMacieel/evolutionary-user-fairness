@@ -1,0 +1,15 @@
+Model:NCF | Dataset:dataset\5Beauty-rand | Group:0.05_count |  Epsilon=None | K=10
+Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244 
+Before optimization group 1 (active) scores  : ndcg@10=0.6176 f1@10=0.2910 
+Before optimization group 2 (inactive) scores: ndcg@10=0.3269 f1@10=0.1091 
+Before optimization UGF (f1@10): 0.1819 (18.19%)
+Dynamic epsilon: original_gap=0.1819, epsilon=0.0909
+Solver status: Optimal
+CPU time: 116.18 seconds
+After optimization overall metric scores     : ndcg@10=0.3584 f1@10=0.1321 
+After optimization group 1 (active) scores   : ndcg@10=0.4886 f1@10=0.2154 
+After optimization group 2 (inactive) scores : ndcg@10=0.3465 f1@10=0.1245 
+After optimization UGF (f1@10): 0.0909 (9.09%)
+UGF reduction: 0.0910 (50.0% improvement)
+
+

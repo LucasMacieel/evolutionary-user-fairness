@@ -755,56 +755,186 @@ class GAOptimizer:
 
 
 if __name__ == "__main__":
-    """Test GA optimizer on a sample dataset."""
+    """
+    Comprehensive evaluation: runs all dataset/model/grouping combinations
+    to replicate the paper's experimental setup.
+    """
     import os
 
-    # Configuration
+    ############### Configuration ###########
+    epsilon = "auto"  # Dynamic epsilon (paper methodology)
     dataset_folder = "../dataset"
-    dataset_name = "5Grocery-rand"
-    model_name = "NCF"
-    group_name = "0.05_count"
 
-    data_path = os.path.join(dataset_folder, dataset_name)
-    rank_file = f"{model_name}_rank.csv"
-    group_1_file = f"{group_name}_active_test_ratings.txt"
-    group_2_file = f"{group_name}_inactive_test_ratings.txt"
+    # All available datasets
+    datasets = ["5Health-rand"]
 
-    # Results directory
-    results_dir = "../results/ga"
-    os.makedirs(results_dir, exist_ok=True)
-    log_file = os.path.join(
-        results_dir, f"GA_{model_name}_{dataset_name}_{group_name}.log"
+    # All available models (must have corresponding *_rank.csv files)
+    models = ["NCF"]
+
+    # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
+    grouping_methods = [
+        (
+            "0.05_count",
+            "0.05_count_active_test_ratings.txt",
+            "0.05_count_inactive_test_ratings.txt",
+        ),
+        (
+            "sum_0.05",
+            "sum_0.05_price_active_test_ratings.txt",
+            "sum_0.05_price_inactive_test_ratings.txt",
+        ),
+        (
+            "max_0.05",
+            "max_0.05_price_active_test_ratings.txt",
+            "max_0.05_price_inactive_test_ratings.txt",
+        ),
+    ]
+
+    # GA parameters
+    ga_population_size = 50
+    ga_generations = 50
+    ga_mutation_rate = 0.1
+    ga_crossover_rate = 0.8
+    ga_elitism_count = 5
+    ga_seed = 42
+
+    metrics = ["ndcg", "f1"]
+    topK = ["10"]
+    metrics_list = [metric + "@" + k for metric in metrics for k in topK]
+
+    # Results collection
+    all_results = []
+
+    # Create results directory
+    results_base_dir = "../results"
+    if not os.path.exists(results_base_dir):
+        os.makedirs(results_base_dir)
+
+    ############### Run all combinations ###########
+    total_runs = len(datasets) * len(models) * len(grouping_methods)
+    current_run = 0
+
+    for dataset_name in datasets:
+        for model_name in models:
+            for group_name, group_1_file, group_2_file in grouping_methods:
+                current_run += 1
+                print("\n" + "=" * 80)
+                print(
+                    f"RUN {current_run}/{total_runs}: {dataset_name} | {model_name} | {group_name}"
+                )
+                print("=" * 80)
+
+                try:
+                    # Setup paths
+                    data_path = os.path.join(dataset_folder, dataset_name)
+                    rank_file = model_name + "_rank.csv"
+
+                    # Check if rank file exists
+                    if not os.path.exists(os.path.join(data_path, rank_file)):
+                        print(f"  SKIPPED: {rank_file} not found")
+                        continue
+
+                    # Setup logging
+                    logger_dir = os.path.join(results_base_dir, model_name, "ga")
+                    if not os.path.exists(logger_dir):
+                        os.makedirs(logger_dir)
+                    logger_file = f"ga_{model_name}_{dataset_name}_{group_name}.log"
+                    logger_path = os.path.join(logger_dir, logger_file)
+
+                    # Load data
+                    dl = DataLoader(
+                        data_path,
+                        rank_file=rank_file,
+                        group_1_file=group_1_file,
+                        group_2_file=group_2_file,
+                    )
+
+                    logger = create_logger(
+                        name=f"ga_logger_{dataset_name}_{model_name}_{group_name}",
+                        path=logger_path,
+                    )
+
+                    # Run GA optimizer
+                    ga = GAOptimizer(
+                        data_loader=dl,
+                        k=10,
+                        eval_metric_list=metrics_list,
+                        fairness_metric="f1",
+                        epsilon=epsilon,
+                        logger=logger,
+                        model_name=model_name,
+                        group_name=group_name,
+                        population_size=ga_population_size,
+                        generations=ga_generations,
+                        mutation_rate=ga_mutation_rate,
+                        crossover_rate=ga_crossover_rate,
+                        elitism_count=ga_elitism_count,
+                        seed=ga_seed,
+                    )
+
+                    # Get results
+                    results = ga.train()
+
+                    # Store results for summary
+                    all_results.append(
+                        {
+                            "Dataset": dataset_name.replace("5", "").replace(
+                                "-rand", ""
+                            ),
+                            "Model": model_name,
+                            "Grouping": group_name,
+                            "Epsilon": ga.epsilon,
+                            "Final_UGF": results["final_ugf"],
+                            "CPU_Time": results["cpu_time"],
+                            "Status": "Completed",
+                        }
+                    )
+
+                    print("  ✓ Completed successfully")
+
+                except Exception as e:
+                    print(f"  ✗ Error: {str(e)}")
+                    all_results.append(
+                        {
+                            "Dataset": dataset_name.replace("5", "").replace(
+                                "-rand", ""
+                            ),
+                            "Model": model_name,
+                            "Grouping": group_name,
+                            "Epsilon": "N/A",
+                            "Final_UGF": "N/A",
+                            "CPU_Time": "N/A",
+                            "Status": f"Error: {str(e)}",
+                        }
+                    )
+
+    ############### Summary ###########
+    print("\n" + "=" * 80)
+    print("EXECUTION SUMMARY")
+    print("=" * 80)
+
+    # Print summary table
+    print(
+        f"\n{'Dataset':<12} {'Model':<12} {'Grouping':<12} {'Epsilon':<10} {'Final_UGF':<12} {'Time(s)':<10} {'Status':<20}"
     )
+    print("-" * 90)
+    for r in all_results:
+        eps_str = (
+            f"{r['Epsilon']:.4f}" if isinstance(r["Epsilon"], float) else r["Epsilon"]
+        )
+        ugf_str = (
+            f"{r['Final_UGF']:.4f}"
+            if isinstance(r["Final_UGF"], float)
+            else r["Final_UGF"]
+        )
+        time_str = (
+            f"{r['CPU_Time']:.2f}"
+            if isinstance(r["CPU_Time"], float)
+            else r["CPU_Time"]
+        )
+        print(
+            f"{r['Dataset']:<12} {r['Model']:<12} {r['Grouping']:<12} {eps_str:<10} {ugf_str:<12} {time_str:<10} {r['Status']:<20}"
+        )
 
-    # Load data
-    print(f"Loading data from {data_path}...")
-    dl = DataLoader(
-        data_path,
-        rank_file=rank_file,
-        group_1_file=group_1_file,
-        group_2_file=group_2_file,
-    )
-
-    logger = create_logger(name="ga_logger", path=log_file)
-
-    # Run GA optimizer
-    ga = GAOptimizer(
-        data_loader=dl,
-        k=10,
-        eval_metric_list=["ndcg@10", "f1@10"],
-        fairness_metric="f1",
-        epsilon="auto",
-        logger=logger,
-        model_name=model_name,
-        group_name=group_name,
-        population_size=50,
-        generations=50,
-        mutation_rate=0.1,
-        crossover_rate=0.8,
-        elitism_count=5,
-        penalty_lambda=None,
-        seed=42,
-    )
-
-    results = ga.train()
-    print(f"\nResults logged to: {log_file}")
+    print(f"\nIndividual logs saved to: {results_base_dir}/<model_name>/ga/")
+    print("\nAll experiments completed!")

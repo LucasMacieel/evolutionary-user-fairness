@@ -1,0 +1,14 @@
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:50 | Gen:50 | Mut:0.1 | Cross:0.8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%)
+Epsilon: 0.1046
+CPU time: 143.82 seconds
+After optimization overall metric scores     : ndcg@10=0.3967 f1@10=0.1244
+After optimization group 1 (active) scores   : ndcg@10=0.5575 f1@10=0.2261
+After optimization group 2 (inactive) scores : ndcg@10=0.3822 f1@10=0.1148
+After optimization UGF: 0.1046
+UGF reduction: 0.1046 (50.0%)
+Constraint satisfied: True

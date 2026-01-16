@@ -1,0 +1,14 @@
+GA Optimizer | Model:NCF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:50 | Gen:50 | Mut:0.1 | Cross:0.8
+Before optimization overall scores           : ndcg@10=0.3355 f1@10=0.1220
+Before optimization group 1 (active) scores  : ndcg@10=0.6172 f1@10=0.3184
+Before optimization group 2 (inactive) scores: ndcg@10=0.3091 f1@10=0.1036
+Before optimization UGF (f1@10): 0.2148 (21.48%)
+Epsilon: 0.1074
+CPU time: 137.56 seconds
+After optimization overall metric scores     : ndcg@10=0.3181 f1@10=0.1062
+After optimization group 1 (active) scores   : ndcg@10=0.5180 f1@10=0.2163
+After optimization group 2 (inactive) scores : ndcg@10=0.3009 f1@10=0.0972
+After optimization UGF: 0.1070
+UGF reduction: 0.1078 (50.2%)
+Constraint satisfied: True

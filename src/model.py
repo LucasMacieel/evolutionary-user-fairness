@@ -16,7 +16,7 @@ class UGF(object):
         logger=None,
         model_name="",
         group_name="",
-        solver="SCIP",  # Default to SCIP
+        solver="highs",  # Default to Highs
     ):
         """
         Train fairness model
@@ -27,7 +27,7 @@ class UGF(object):
         :param epsilon: the upper bound for difference between groups.
                         Use 'auto' to calculate as half of original UGF gap (paper methodology)
         :param logger: logger for logging info
-        :param solver: Solver to use ('SCIP' or 'Highs'), default='SCIP'
+        :param solver: Solver to use ('SCIP' or 'Highs'), default='Highs'
         """
         self.data_loader = data_loader
         self.dataset_name = data_loader.path.split("/")[-1]
@@ -344,18 +344,16 @@ if __name__ == "__main__":
     Comprehensive evaluation: runs all dataset/model/grouping combinations
     to replicate the paper's experimental setup.
     """
-    import csv
-    from datetime import datetime
 
     ############### Configuration ###########
     epsilon = "auto"  # Dynamic epsilon (paper methodology)
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
+    datasets = ["5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["NCF", "biasedMF"]
+    models = ["biasedMF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [
@@ -375,6 +373,8 @@ if __name__ == "__main__":
             "max_0.05_price_inactive_test_ratings.txt",
         ),
     ]
+
+    solver = "highs"
 
     metrics = ["ndcg", "f1"]
     topK = ["10"]
@@ -413,11 +413,11 @@ if __name__ == "__main__":
                         continue
 
                     # Setup logging
-                    logger_dir = os.path.join(results_base_dir, model_name)
+                    logger_dir = os.path.join(results_base_dir, model_name, solver)
                     if not os.path.exists(logger_dir):
                         os.makedirs(logger_dir)
                     logger_file = (
-                        f"{model_name}_{dataset_name}_{group_name}_reRank_result.log"
+                        f"{solver}_{model_name}_{dataset_name}_{group_name}.log"
                     )
                     logger_path = os.path.join(logger_dir, logger_file)
 
@@ -444,7 +444,7 @@ if __name__ == "__main__":
                         logger=logger,
                         model_name=model_name,
                         group_name=group_name,
-                        solver="SCIP",
+                        solver=solver,
                     )
 
                     # Get before/after results
@@ -497,17 +497,5 @@ if __name__ == "__main__":
             f"{r['Dataset']:<12} {r['Model']:<12} {r['Grouping']:<12} {eps_str:<10} {r['Status']:<20}"
         )
 
-    # Save summary to CSV
-    summary_file = os.path.join(
-        results_base_dir, f"summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    )
-    with open(summary_file, "w", newline="") as f:
-        writer = csv.DictWriter(
-            f, fieldnames=["Dataset", "Model", "Grouping", "Epsilon", "Status"]
-        )
-        writer.writeheader()
-        writer.writerows(all_results)
-
-    print(f"\nSummary saved to: {summary_file}")
     print(f"Individual logs saved to: {results_base_dir}/<model_name>/")
     print("\nAll experiments completed!")
