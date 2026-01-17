@@ -54,6 +54,8 @@ class GAOptimizer:
         # Non-uniform mutation parameters (Michalewicz paper Section 2.1)
         mutation_rate_min: float = 0.05,  # Minimum mutation rate at end
         mutation_decay_b: float = 2.0,  # Non-uniformity degree (higher = faster decay)
+        # Pre-built data for faster initialization (use build_vectorized_data())
+        prebuilt_data: Dict = None,
     ):
         """Initialize GA optimizer with vectorized data structures."""
         self.data_loader = data_loader
@@ -95,61 +97,172 @@ class GAOptimizer:
         else:
             self.logger = logger
 
-        # Prepare vectorized data structures
-        self._prepare_vectorized_data()
+        # Use pre-built vectorized data, or load/build with disk caching
+        if prebuilt_data is not None:
+            self._load_prebuilt_data(prebuilt_data)
+        else:
+            # Check for disk cache first
+            import os
 
-    def _prepare_vectorized_data(self):
-        """Convert data to vectorized format for fast computation."""
-        self.all_df = self.data_loader.rank_df.copy(deep=True)
-        self.g1_df = self.data_loader.g1_df.copy(deep=True)
-        self.g2_df = self.data_loader.g2_df.copy(deep=True)
+            cache_dir = os.path.join(os.path.dirname(__file__), "cache")
+            os.makedirs(cache_dir, exist_ok=True)
+            cache_file = os.path.join(
+                cache_dir, f"vectorized_cache_{model_name}_{group_name}_k{k}.pkl"
+            )
+
+            if os.path.exists(cache_file):
+                # Load from disk cache (fast)
+                prebuilt_data = GAOptimizer.load_vectorized_data(cache_file)
+            else:
+                # Build and save to disk cache for future runs
+                prebuilt_data = GAOptimizer.build_vectorized_data(data_loader, k)
+                GAOptimizer.save_vectorized_data(prebuilt_data, cache_file)
+
+            self._load_prebuilt_data(prebuilt_data)
+
+    @staticmethod
+    def build_vectorized_data(data_loader: DataLoader, k: int = 10) -> Dict:
+        """
+        Build vectorized data structures once for reuse across multiple GA instances.
+
+        This is useful for hyperparameter tuning where the same data is used
+        across many trials, avoiding redundant data preparation.
+
+        Args:
+            data_loader: DataLoader instance with loaded data
+            k: Top-K for recommendation (needed for F1 denominator)
+
+        Returns:
+            Dictionary containing all pre-built vectorized data structures
+        """
+        all_df = data_loader.rank_df.copy(deep=True)
+        g1_df = data_loader.g1_df.copy(deep=True)
+        g2_df = data_loader.g2_df.copy(deep=True)
 
         # Get unique users
-        self.user_ids = self.all_df["uid"].unique()
-        self.n_users = len(self.user_ids)
-        self.user_id_to_idx = {uid: idx for idx, uid in enumerate(self.user_ids)}
+        user_ids = all_df["uid"].unique()
+        n_users = len(user_ids)
+        user_id_to_idx = {uid: idx for idx, uid in enumerate(user_ids)}
 
-        # Determine max items per user (handle variable-length candidate lists)
-        user_counts = self.all_df.groupby("uid").size()
-        self.n_items = user_counts.max()  # Use max to handle variable lengths
-        self.items_per_user = user_counts.to_dict()  # Store actual count per user
+        # Determine max items per user
+        user_counts = all_df.groupby("uid").size()
+        n_items = user_counts.max()
+        items_per_user = user_counts.to_dict()
 
-        # Build score and label matrices: shape (n_users, n_items)
-        self.scores_matrix = np.zeros((self.n_users, self.n_items), dtype=np.float32)
-        self.labels_matrix = np.zeros((self.n_users, self.n_items), dtype=np.float32)
+        # Build score and label matrices
+        import numpy as np
 
-        for uid in self.user_ids:
-            idx = self.user_id_to_idx[uid]
-            user_df = self.all_df[self.all_df["uid"] == uid]
+        scores_matrix = np.zeros((n_users, n_items), dtype=np.float32)
+        labels_matrix = np.zeros((n_users, n_items), dtype=np.float32)
+
+        for uid in user_ids:
+            idx = user_id_to_idx[uid]
+            user_df = all_df[all_df["uid"] == uid]
             n = len(user_df)
-            self.scores_matrix[idx, :n] = user_df["score"].values
-            self.labels_matrix[idx, :n] = user_df["label"].values
+            scores_matrix[idx, :n] = user_df["score"].values
+            labels_matrix[idx, :n] = user_df["label"].values
 
-        # Pre-compute total relevant items per user
-        self.total_relevant = self.labels_matrix.sum(axis=1)  # shape (n_users,)
+        # Pre-compute derived values
+        total_relevant = labels_matrix.sum(axis=1)
+        has_relevant = total_relevant > 0
+        f1_denominator = total_relevant + k
 
-        # Group masks: boolean arrays indicating group membership
-        g1_users = set(self.g1_df["uid"].unique())
-        g2_users = set(self.g2_df["uid"].unique())
+        # Group masks
+        g1_users = set(g1_df["uid"].unique())
+        g2_users = set(g2_df["uid"].unique())
+        g1_mask = np.array([uid in g1_users for uid in user_ids])
+        g2_mask = np.array([uid in g2_users for uid in user_ids])
 
-        # Cache group sets for fast isin() lookups in _evaluate_groups
-        self._g1_user_set = g1_users
-        self._g2_user_set = g2_users
+        print(f"Pre-built vectorized data: {n_users} users, {n_items} items per user")
+        print(f"Group 1: {g1_mask.sum()} users, Group 2: {g2_mask.sum()} users")
 
-        self.g1_mask = np.array([uid in g1_users for uid in self.user_ids])
-        self.g2_mask = np.array([uid in g2_users for uid in self.user_ids])
+        return {
+            "all_df": all_df,
+            "g1_df": g1_df,
+            "g2_df": g2_df,
+            "user_ids": user_ids,
+            "n_users": n_users,
+            "n_items": n_items,
+            "user_id_to_idx": user_id_to_idx,
+            "items_per_user": items_per_user,
+            "scores_matrix": scores_matrix,
+            "labels_matrix": labels_matrix,
+            "total_relevant": total_relevant,
+            "has_relevant": has_relevant,
+            "f1_denominator": f1_denominator,
+            "g1_mask": g1_mask,
+            "g2_mask": g2_mask,
+            "_g1_user_set": g1_users,
+            "_g2_user_set": g2_users,
+            "n_g1": g1_mask.sum(),
+            "n_g2": g2_mask.sum(),
+        }
 
-        # Users with relevant items (for metric calculation)
-        self.has_relevant = self.total_relevant > 0
+    @staticmethod
+    def save_vectorized_data(data: Dict, filepath: str) -> None:
+        """
+        Save pre-built vectorized data to disk using pickle.
 
-        # Pre-compute denominators for F1
-        self.f1_denominator = self.total_relevant + self.k
+        Args:
+            data: Dictionary from build_vectorized_data()
+            filepath: Path to save the pickle file (e.g., 'cache/vectorized_data.pkl')
+        """
+        import pickle
+        import os
 
-        self.n_g1 = self.g1_mask.sum()
-        self.n_g2 = self.g2_mask.sum()
+        # Create directory if needed
+        os.makedirs(
+            os.path.dirname(filepath) if os.path.dirname(filepath) else ".",
+            exist_ok=True,
+        )
 
-        print(f"Vectorized data: {self.n_users} users, {self.n_items} items per user")
-        print(f"Group 1: {self.n_g1} users, Group 2: {self.n_g2} users")
+        with open(filepath, "wb") as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+        print(f"Vectorized data saved to: {filepath}")
+
+    @staticmethod
+    def load_vectorized_data(filepath: str) -> Dict:
+        """
+        Load pre-built vectorized data from disk.
+
+        Args:
+            filepath: Path to the pickle file
+
+        Returns:
+            Dictionary containing vectorized data structures
+        """
+        import pickle
+
+        with open(filepath, "rb") as f:
+            data = pickle.load(f)
+
+        print(f"Vectorized data loaded from: {filepath}")
+        print(f"  {data['n_users']} users, {data['n_items']} items per user")
+
+        return data
+
+    def _load_prebuilt_data(self, data: Dict):
+        """Load pre-built vectorized data structures."""
+        self.all_df = data["all_df"]
+        self.g1_df = data["g1_df"]
+        self.g2_df = data["g2_df"]
+        self.user_ids = data["user_ids"]
+        self.n_users = data["n_users"]
+        self.n_items = data["n_items"]
+        self.user_id_to_idx = data["user_id_to_idx"]
+        self.items_per_user = data["items_per_user"]
+        self.scores_matrix = data["scores_matrix"]
+        self.labels_matrix = data["labels_matrix"]
+        self.total_relevant = data["total_relevant"]
+        self.has_relevant = data["has_relevant"]
+        self.f1_denominator = data["f1_denominator"]
+        self.g1_mask = data["g1_mask"]
+        self.g2_mask = data["g2_mask"]
+        self._g1_user_set = data["_g1_user_set"]
+        self._g2_user_set = data["_g2_user_set"]
+        self.n_g1 = data["n_g1"]
+        self.n_g2 = data["n_g2"]
 
     def _calculate_fitness_batch(
         self, population: np.ndarray, current_epsilon: float
