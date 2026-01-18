@@ -10,11 +10,14 @@ This module implements a GA that solves the same problem as the MILP solver:
 - subject to selection constraint: exactly K items per user
 """
 
+import os
+import pickle
 import numpy as np
 import pandas as pd
-import time
 import random
+import time
 from typing import List, Tuple, Dict
+
 from data_loader import DataLoader
 from utils.tools import create_logger, evaluation_methods
 
@@ -24,6 +27,12 @@ class GAOptimizer:
     Genetic Algorithm optimizer for fairness-aware recommendation re-ranking.
     Uses vectorized NumPy operations for performance.
     """
+
+    # Class constants
+    FEASIBILITY_TOLERANCE = 1e-9
+    START_EPSILON_FACTOR = 0.99
+    INIT_MUTATION_RATE = 0.2
+    REPAIR_THRESHOLD_DEFAULT = 0.05
 
     def __init__(
         self,
@@ -102,12 +111,13 @@ class GAOptimizer:
             self._load_prebuilt_data(prebuilt_data)
         else:
             # Check for disk cache first
-            import os
-
             cache_dir = os.path.join(os.path.dirname(__file__), "cache")
             os.makedirs(cache_dir, exist_ok=True)
+            # Include dataset name in cache key to prevent cross-dataset cache collision
+            dataset_name = os.path.basename(data_loader.path)
             cache_file = os.path.join(
-                cache_dir, f"vectorized_cache_{model_name}_{group_name}_k{k}.pkl"
+                cache_dir,
+                f"vectorized_cache_{dataset_name}_{model_name}_{group_name}_k{k}.pkl",
             )
 
             if os.path.exists(cache_file):
@@ -207,9 +217,6 @@ class GAOptimizer:
             data: Dictionary from build_vectorized_data()
             filepath: Path to save the pickle file (e.g., 'cache/vectorized_data.pkl')
         """
-        import pickle
-        import os
-
         # Create directory if needed
         os.makedirs(
             os.path.dirname(filepath) if os.path.dirname(filepath) else ".",
@@ -232,8 +239,6 @@ class GAOptimizer:
         Returns:
             Dictionary containing vectorized data structures
         """
-        import pickle
-
         with open(filepath, "rb") as f:
             data = pickle.load(f)
 
@@ -351,8 +356,7 @@ class GAOptimizer:
         # Perturb the population (except the first one which stays pure greedy)
         # We apply mutations to diversify the population
         # Use a slightly higher rate for initialization diversity
-        init_mutation_rate = 0.2
-        mutate_mask = np.random.random((size, self.n_users)) < init_mutation_rate
+        mutate_mask = np.random.random((size, self.n_users)) < self.INIT_MUTATION_RATE
 
         for i in range(1, size):  # Skip index 0 to keep one pure greedy
             for u in range(self.n_users):
@@ -463,7 +467,10 @@ class GAOptimizer:
         mutate_mask = np.random.random((pop_size, self.n_users)) < rate
 
         # Repair logic thresholds
-        apply_repair = abs(bias_dir) > (self.epsilon if self.epsilon else 0.05)
+        repair_threshold = (
+            self.epsilon if self.epsilon else self.REPAIR_THRESHOLD_DEFAULT
+        )
+        apply_repair = abs(bias_dir) > repair_threshold
         # If bias is positive (G1 > G2), we want to lower G1 (Suppress) and raise G2 (Boost)
         # If bias is negative (G2 > G1), we want to lower G2 (Suppress) and raise G1 (Boost)
 
@@ -593,13 +600,13 @@ class GAOptimizer:
                 obj_A = cand_obj[curr_idx]
                 viol_A = cand_viol[curr_idx]
                 is_feas_A = (
-                    viol_A <= 1e-9
+                    viol_A <= self.FEASIBILITY_TOLERANCE
                 )  # Treat effectively 0 as feasible to handle float precision
 
                 # Metrics for B
                 obj_B = cand_obj[challenger_idx]
                 viol_B = cand_viol[challenger_idx]
-                is_feas_B = viol_B <= 1e-9
+                is_feas_B = viol_B <= self.FEASIBILITY_TOLERANCE
 
                 if is_feas_A and is_feas_B:
                     # Both feasible: better objective wins
@@ -653,22 +660,28 @@ class GAOptimizer:
             "g2": evaluation_methods(g2_df, metrics),
         }
 
-    def train(self) -> Dict:
-        """Run GA optimization with vectorized operations."""
-        self.logger.info(
-            f"GA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
-            f"Group:{self.group_name} | K={self.k} | Fairness_metric={self.fairness_metric}"
+    def _format_metrics(self, eval_result: List[float]) -> str:
+        """Format evaluation metrics as 'metric=value' string."""
+        return " ".join(
+            [f"{m}={eval_result[i]:.4f}" for i, m in enumerate(self.eval_metric_list)]
         )
-        self.logger.info(
-            f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
-            f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
-        )
-        if self.adaptive_penalty:
-            self.logger.info(
-                f"Adaptive Penalty | beta1:{self.penalty_beta1} | beta2:{self.penalty_beta2} | k:{self.penalty_history_k}"
-            )
 
-        # Print original metrics (overall and per group)
+    @staticmethod
+    def _get_best_idx(objectives: np.ndarray, violations: np.ndarray) -> int:
+        """
+        Get index of best individual using Deb's feasibility rules.
+        Primary sort: ascending violation, secondary sort: descending objective.
+        """
+        indices = np.lexsort((-objectives, violations))
+        return indices[0]
+
+    def _log_baseline_metrics(self) -> Tuple[np.ndarray, Dict]:
+        """
+        Evaluate and log baseline (greedy) metrics, calculate UGF and set epsilon.
+
+        Returns:
+            Tuple of (baseline_solution, baseline_eval)
+        """
         print("=" * 70)
         print("Before optimization (baseline - top-K by score):")
         baseline_solution = self._create_greedy_individual()
@@ -678,30 +691,15 @@ class GAOptimizer:
         baseline_eval = self._evaluate_groups(baseline_df, self.eval_metric_list)
 
         # Format and print metrics
-        metric_str = " ".join(
-            [
-                f"{m}={baseline_eval['overall'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
-        )
+        metric_str = self._format_metrics(baseline_eval["overall"])
         print(f"  Overall: {metric_str}")
         self.logger.info(f"Before optimization overall scores           : {metric_str}")
 
-        metric_str = " ".join(
-            [
-                f"{m}={baseline_eval['g1'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
-        )
+        metric_str = self._format_metrics(baseline_eval["g1"])
         print(f"  Group 1 (advantaged): {metric_str}")
         self.logger.info(f"Before optimization group 1 (active) scores  : {metric_str}")
 
-        metric_str = " ".join(
-            [
-                f"{m}={baseline_eval['g2'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
-        )
+        metric_str = self._format_metrics(baseline_eval["g2"])
         print(f"  Group 2 (disadvantaged): {metric_str}")
         self.logger.info(f"Before optimization group 2 (inactive) scores: {metric_str}")
 
@@ -730,6 +728,99 @@ class GAOptimizer:
         print(f"  Start epsilon: {self.original_ugf:.4f} (baseline feasible)")
         print(f"  Target epsilon: {self.epsilon:.4f}")
 
+        return baseline_solution, baseline_eval
+
+    def _log_final_results(
+        self,
+        final_solution: np.ndarray,
+        target_epsilon: float,
+        baseline_eval: Dict,
+        best_fitness: float,
+        cpu_time: float,
+    ) -> Dict:
+        """
+        Evaluate and log final optimization results.
+
+        Returns:
+            Results dictionary with all metrics.
+        """
+        print("\n" + "=" * 70)
+        print("After optimization (GA solution):")
+        final_df = self._solution_to_dataframe(final_solution)
+
+        # Evaluate overall and per-group metrics
+        final_eval = self._evaluate_groups(final_df, self.eval_metric_list)
+
+        metric_str = self._format_metrics(final_eval["overall"])
+        print(f"  Overall: {metric_str}")
+        self.logger.info(f"After optimization overall metric scores     : {metric_str}")
+
+        metric_str = self._format_metrics(final_eval["g1"])
+        print(f"  Group 1 (advantaged): {metric_str}")
+        self.logger.info(f"After optimization group 1 (active) scores   : {metric_str}")
+
+        metric_str = self._format_metrics(final_eval["g2"])
+        print(f"  Group 2 (disadvantaged): {metric_str}")
+        self.logger.info(f"After optimization group 2 (inactive) scores : {metric_str}")
+
+        # Final UGF
+        final_pop = final_solution[np.newaxis, :, :]
+        _, _, final_ugf_arr, _ = self._calculate_fitness_batch(
+            final_pop, target_epsilon
+        )
+        final_ugf = final_ugf_arr[0]
+
+        print(f"  Final UGF gap: {final_ugf:.4f} ({final_ugf * 100:.2f}%)")
+        self.logger.info(f"After optimization UGF: {final_ugf:.4f}")
+
+        # UGF improvement
+        ugf_reduction = self.original_ugf - final_ugf
+        ugf_reduction_pct = (
+            (ugf_reduction / self.original_ugf) * 100 if self.original_ugf > 0 else 0
+        )
+        print(
+            f"\nUGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}% improvement)"
+        )
+        self.logger.info(
+            f"UGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}%)"
+        )
+
+        # Check constraint satisfaction
+        constraint_satisfied = final_ugf <= self.epsilon
+        print(
+            f"Fairness constraint (UGF <= {self.epsilon:.4f}): {'SATISFIED' if constraint_satisfied else 'VIOLATED'}"
+        )
+        self.logger.info(f"Constraint satisfied: {constraint_satisfied}")
+
+        return {
+            "baseline_metrics": baseline_eval["overall"],
+            "final_metrics": final_eval["overall"],
+            "original_ugf": self.original_ugf,
+            "final_ugf": final_ugf,
+            "epsilon": self.epsilon,
+            "constraint_satisfied": constraint_satisfied,
+            "cpu_time": cpu_time,
+            "best_fitness": best_fitness,
+        }
+
+    def train(self) -> Dict:
+        """Run GA optimization with vectorized operations."""
+        self.logger.info(
+            f"GA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
+            f"Group:{self.group_name} | K={self.k} | Fairness_metric={self.fairness_metric}"
+        )
+        self.logger.info(
+            f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
+            f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
+        )
+        if self.adaptive_penalty:
+            self.logger.info(
+                f"Adaptive Penalty | beta1:{self.penalty_beta1} | beta2:{self.penalty_beta2} | k:{self.penalty_history_k}"
+            )
+
+        # Evaluate baseline and set epsilon
+        baseline_solution, baseline_eval = self._log_baseline_metrics()
+
         # Initialize population
         print("\nStarting GA optimization (vectorized)...")
         start_time = time.perf_counter()
@@ -739,21 +830,13 @@ class GAOptimizer:
 
         # Initial evaluation
         # Start slightly tighter than original to force immediate movement
-        start_epsilon = self.original_ugf * 0.99
-        target_epsilon = self.epsilon
-        # Initial evaluation
-        # Start slightly tighter than original to force immediate movement
-        start_epsilon = self.original_ugf * 0.99
+        start_epsilon = self.original_ugf * self.START_EPSILON_FACTOR
         target_epsilon = self.epsilon
         objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(
             population, start_epsilon
         )
 
-        def get_best_idx(objs, viols):
-            indices = np.lexsort((-objs, viols))
-            return indices[0]
-
-        best_idx = get_best_idx(objectives, violations)
+        best_idx = self._get_best_idx(objectives, violations)
         best_fitness = objectives[best_idx]
         best_solution = population[best_idx].copy()
         best_ugf = ugf_gaps[best_idx]
@@ -830,13 +913,13 @@ class GAOptimizer:
             )
 
             # Track best
-            gen_best_idx = get_best_idx(objectives, violations)
+            gen_best_idx = self._get_best_idx(objectives, violations)
             gen_best_fitness = objectives[gen_best_idx]
             gen_best_ugf = ugf_gaps[gen_best_idx]
             gen_best_viol = violations[gen_best_idx]
 
             # Update feasibility history for adaptive penalty
-            gen_best_is_feasible = gen_best_viol <= 1e-9
+            gen_best_is_feasible = gen_best_viol <= self.FEASIBILITY_TOLERANCE
             feasibility_history.append(gen_best_is_feasible)
 
             if gen_best_fitness > best_fitness:
@@ -901,80 +984,10 @@ class GAOptimizer:
             )
             final_solution = best_solution
 
-        # Final results with group breakdown
-        print("\n" + "=" * 70)
-        print("After optimization (GA solution):")
-        final_df = self._solution_to_dataframe(final_solution)
-
-        # Evaluate overall and per-group metrics
-        final_eval = self._evaluate_groups(final_df, self.eval_metric_list)
-
-        metric_str = " ".join(
-            [
-                f"{m}={final_eval['overall'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
+        # Log final results and return metrics
+        return self._log_final_results(
+            final_solution, target_epsilon, baseline_eval, best_fitness, cpu_time
         )
-        print(f"  Overall: {metric_str}")
-        self.logger.info(f"After optimization overall metric scores     : {metric_str}")
-
-        metric_str = " ".join(
-            [
-                f"{m}={final_eval['g1'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
-        )
-        print(f"  Group 1 (advantaged): {metric_str}")
-        self.logger.info(f"After optimization group 1 (active) scores   : {metric_str}")
-
-        metric_str = " ".join(
-            [
-                f"{m}={final_eval['g2'][i]:.4f}"
-                for i, m in enumerate(self.eval_metric_list)
-            ]
-        )
-        print(f"  Group 2 (disadvantaged): {metric_str}")
-        self.logger.info(f"After optimization group 2 (inactive) scores : {metric_str}")
-
-        # Final UGF
-        final_pop = final_solution[np.newaxis, :, :]
-        _, _, final_ugf_arr, _ = self._calculate_fitness_batch(
-            final_pop, target_epsilon
-        )
-        final_ugf = final_ugf_arr[0]
-
-        print(f"  Final UGF gap: {final_ugf:.4f} ({final_ugf * 100:.2f}%)")
-        self.logger.info(f"After optimization UGF: {final_ugf:.4f}")
-
-        # UGF improvement
-        ugf_reduction = self.original_ugf - final_ugf
-        ugf_reduction_pct = (
-            (ugf_reduction / self.original_ugf) * 100 if self.original_ugf > 0 else 0
-        )
-        print(
-            f"\nUGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}% improvement)"
-        )
-        self.logger.info(
-            f"UGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}%)"
-        )
-
-        # Check constraint satisfaction
-        constraint_satisfied = final_ugf <= self.epsilon
-        print(
-            f"Fairness constraint (UGF <= {self.epsilon:.4f}): {'SATISFIED' if constraint_satisfied else 'VIOLATED'}"
-        )
-        self.logger.info(f"Constraint satisfied: {constraint_satisfied}")
-
-        return {
-            "baseline_metrics": baseline_eval["overall"],
-            "final_metrics": final_eval["overall"],
-            "original_ugf": self.original_ugf,
-            "final_ugf": final_ugf,
-            "epsilon": self.epsilon,
-            "constraint_satisfied": constraint_satisfied,
-            "cpu_time": cpu_time,
-            "best_fitness": best_fitness,
-        }
 
 
 if __name__ == "__main__":
@@ -989,10 +1002,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Health-rand"]
+    datasets = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["NCF"]
+    models = ["NCF", "biasedMF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [
