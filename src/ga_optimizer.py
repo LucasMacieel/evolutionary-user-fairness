@@ -32,7 +32,6 @@ class GAOptimizer:
     FEASIBILITY_TOLERANCE = 1e-9
     START_EPSILON_FACTOR = 0.99
     INIT_MUTATION_RATE = 0.2
-    REPAIR_THRESHOLD_DEFAULT = 0.05
 
     def __init__(
         self,
@@ -45,24 +44,20 @@ class GAOptimizer:
         model_name: str = "",
         group_name: str = "",
         # GA parameters (optimized via Optuna hyperparameter tuning)
-        population_size: int = 20,
+        population_size: int = 10,
         generations: int = 50,
-        mutation_rate: float = 0.24,
-        crossover_rate: float = 0.55,
-        crossover_n_parents: int = 3,  # Number of parents for gene pool recombination
-        elitism_count: int = 10,
+        mutation_rate: float = 0.3030,
+        crossover_rate: float = 0.9715,
+        elitism_count: int = 9,
         penalty_lambda: float = None,
         seed: int = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
         adaptive_penalty: bool = True,
-        penalty_beta1: float = 1.5,  # Tightening factor when all feasible
-        penalty_beta2: float = 1.5,  # Relaxation factor when all infeasible
-        penalty_history_k: int = 5,  # Lookback window for feasibility history
+        penalty_beta1: float = 2.54,  # Tightening factor when all feasible
+        penalty_beta2: float = 3.00,  # Relaxation factor when all infeasible
+        penalty_history_k: int = 9,  # Lookback window for feasibility history
         # Early stopping parameters
         early_stopping: bool = True,  # Halt immediately when feasible solution found
-        # Non-uniform mutation parameters (Michalewicz paper Section 2.1)
-        mutation_rate_min: float = 0.05,  # Minimum mutation rate at end
-        mutation_decay_b: float = 2.0,  # Non-uniformity degree (higher = faster decay)
         # Pre-built data for faster initialization (use build_vectorized_data())
         prebuilt_data: Dict = None,
     ):
@@ -83,7 +78,6 @@ class GAOptimizer:
         self.generations = generations
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
-        self.crossover_n_parents = crossover_n_parents
         self.elitism_count = elitism_count
         self._penalty_lambda_input = penalty_lambda
         self.penalty_lambda = None
@@ -94,8 +88,6 @@ class GAOptimizer:
         self.penalty_beta2 = penalty_beta2
         self.penalty_history_k = penalty_history_k
         self.early_stopping = early_stopping
-        self.mutation_rate_min = mutation_rate_min
-        self.mutation_decay_b = mutation_decay_b
 
         if seed is not None:
             random.seed(seed)
@@ -383,7 +375,7 @@ class GAOptimizer:
 
         return individual
 
-    def _multi_parent_crossover(
+    def _two_parent_crossover(
         self,
         population: np.ndarray,
         objectives: np.ndarray,
@@ -391,10 +383,10 @@ class GAOptimizer:
         n_offspring: int,
     ) -> np.ndarray:
         """
-        Multi-parent crossover using gene pool recombination (Michalewicz paper Section 2.2).
+        Two-parent uniform crossover.
 
-        For each offspring, select n_parents from the population via tournament selection.
-        For each user position, randomly pick from one of the n_parents.
+        For each offspring, select 2 parents from the population via tournament selection.
+        For each user position, randomly pick from one of the two parents.
 
         Returns:
             offspring: shape (n_offspring, n_users, n_items)
@@ -411,39 +403,16 @@ class GAOptimizer:
                 offspring[i] = parent
                 continue
 
-            # Select n_parents for gene pool
-            parents = self._tournament_selection(
-                population, objectives, violations, self.crossover_n_parents
-            )
+            # Select 2 parents for crossover
+            parents = self._tournament_selection(population, objectives, violations, 2)
 
-            # For each user, randomly pick from one parent
-            parent_choices = np.random.randint(
-                0, self.crossover_n_parents, size=self.n_users
-            )
+            # For each user, randomly pick from one parent (uniform crossover)
+            parent_choices = np.random.randint(0, 2, size=self.n_users)
 
             for u in range(self.n_users):
                 offspring[i, u] = parents[parent_choices[u], u]
 
         return offspring
-
-    def _get_mutation_rate(self, gen: int) -> float:
-        """
-        Non-uniform mutation rate decay (Michalewicz paper Section 2.1).
-
-        rate(t) = rate_max - (rate_max - rate_min) * (t/T)^b
-
-        - Early: high mutation rate (broad exploration)
-        - Late: low mutation rate (local refinement)
-        """
-        if self.generations <= 1:
-            return self.mutation_rate
-
-        progress = gen / (self.generations - 1)  # 0 to 1
-        decay = progress**self.mutation_decay_b
-        current_rate = (
-            self.mutation_rate - (self.mutation_rate - self.mutation_rate_min) * decay
-        )
-        return current_rate
 
     def _mutate_batch(
         self, population: np.ndarray, bias_dir: float = 0.0, current_rate: float = None
@@ -466,11 +435,8 @@ class GAOptimizer:
         # Decide which users to mutate for each individual
         mutate_mask = np.random.random((pop_size, self.n_users)) < rate
 
-        # Repair logic thresholds
-        repair_threshold = (
-            self.epsilon if self.epsilon else self.REPAIR_THRESHOLD_DEFAULT
-        )
-        apply_repair = abs(bias_dir) > repair_threshold
+        # Repair logic: apply bias when violation exceeds epsilon
+        apply_repair = abs(bias_dir) > self.epsilon
         # If bias is positive (G1 > G2), we want to lower G1 (Suppress) and raise G2 (Boost)
         # If bias is negative (G2 > G1), we want to lower G2 (Suppress) and raise G1 (Boost)
 
@@ -884,24 +850,21 @@ class GAOptimizer:
             elite_indices = sorted_indices[: self.elitism_count]
             elites = population[elite_indices].copy()
 
-            # Multi-parent crossover (gene pool recombination)
+            # Two-parent uniform crossover
             n_offspring = self.population_size - self.elitism_count
-            offspring = self._multi_parent_crossover(
+            offspring = self._two_parent_crossover(
                 population, objectives, violations, n_offspring
             )
 
-            # Mutation with non-uniform decay and Repair Bias
+            # Mutation with Repair Bias
             # Determine current bias direction from population average
             # (Use previous generation's evaluation to guide mutation)
             # A positive mean means G1 is generally advantaged -> Suppress G1, Boost G2
             avg_bias = np.mean(signed_ugf)
 
-            # Get decayed mutation rate (high early, low late)
-            current_mutation_rate = self._get_mutation_rate(gen)
-
-            # Mutation with Repair Bias
+            # Apply mutation with fixed rate
             offspring = self._mutate_batch(
-                offspring, bias_dir=avg_bias, current_rate=current_mutation_rate
+                offspring, bias_dir=avg_bias, current_rate=self.mutation_rate
             )
 
             # New population
@@ -954,7 +917,7 @@ class GAOptimizer:
                     elif not any(recent):
                         adapt_status = " [TIGHT]"
                 print(
-                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, mut={current_mutation_rate:.3f}, "
+                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, mut={self.mutation_rate:.3f}, "
                     f"best_obj={gen_best_fitness:.2f}, UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
                 )
 
@@ -1023,7 +986,7 @@ if __name__ == "__main__":
             "max_0.05",
             "max_0.05_price_active_test_ratings.txt",
             "max_0.05_price_inactive_test_ratings.txt",
-        ),
+        )
     ]
 
     ga_seed = 42
