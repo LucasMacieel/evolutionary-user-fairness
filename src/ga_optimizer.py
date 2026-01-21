@@ -45,7 +45,7 @@ class GAOptimizer:
         group_name: str = "",
         # GA parameters (optimized via Optuna hyperparameter tuning)
         population_size: int = 10,
-        generations: int = 50,
+        generations: int = 200,
         mutation_rate: float = 0.3030,
         crossover_rate: float = 0.9715,
         elitism_count: int = 9,
@@ -175,9 +175,6 @@ class GAOptimizer:
         g1_mask = np.array([uid in g1_users for uid in user_ids])
         g2_mask = np.array([uid in g2_users for uid in user_ids])
 
-        print(f"Pre-built vectorized data: {n_users} users, {n_items} items per user")
-        print(f"Group 1: {g1_mask.sum()} users, Group 2: {g2_mask.sum()} users")
-
         return {
             "all_df": all_df,
             "g1_df": g1_df,
@@ -218,8 +215,6 @@ class GAOptimizer:
         with open(filepath, "wb") as f:
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-        print(f"Vectorized data saved to: {filepath}")
-
     @staticmethod
     def load_vectorized_data(filepath: str) -> Dict:
         """
@@ -233,10 +228,6 @@ class GAOptimizer:
         """
         with open(filepath, "rb") as f:
             data = pickle.load(f)
-
-        print(f"Vectorized data loaded from: {filepath}")
-        print(f"  {data['n_users']} users, {data['n_items']} items per user")
-
         return data
 
     def _load_prebuilt_data(self, data: Dict):
@@ -648,51 +639,42 @@ class GAOptimizer:
         Returns:
             Tuple of (baseline_solution, baseline_eval)
         """
-        print("=" * 70)
-        print("Before optimization (baseline - top-K by score):")
         baseline_solution = self._create_greedy_individual()
         baseline_df = self._solution_to_dataframe(baseline_solution)
-
-        # Evaluate overall and per-group metrics
         baseline_eval = self._evaluate_groups(baseline_df, self.eval_metric_list)
 
-        # Format and print metrics
-        metric_str = self._format_metrics(baseline_eval["overall"])
-        print(f"  Overall: {metric_str}")
-        self.logger.info(f"Before optimization overall scores           : {metric_str}")
+        # Log to file
+        self.logger.info(
+            f"Before optimization overall scores           : {self._format_metrics(baseline_eval['overall'])}"
+        )
+        self.logger.info(
+            f"Before optimization group 1 (active) scores  : {self._format_metrics(baseline_eval['g1'])}"
+        )
+        self.logger.info(
+            f"Before optimization group 2 (inactive) scores: {self._format_metrics(baseline_eval['g2'])}"
+        )
 
-        metric_str = self._format_metrics(baseline_eval["g1"])
-        print(f"  Group 1 (advantaged): {metric_str}")
-        self.logger.info(f"Before optimization group 1 (active) scores  : {metric_str}")
-
-        metric_str = self._format_metrics(baseline_eval["g2"])
-        print(f"  Group 2 (disadvantaged): {metric_str}")
-        self.logger.info(f"Before optimization group 2 (inactive) scores: {metric_str}")
-
-        # Calculate original UGF using batch method with single individual
-        baseline_pop = baseline_solution[np.newaxis, :, :]  # Add batch dimension
+        # Calculate original UGF
+        baseline_pop = baseline_solution[np.newaxis, :, :]
         _, _, ugf_gaps, _ = self._calculate_fitness_batch(
             baseline_pop, current_epsilon=1.0
         )
         self.original_ugf = ugf_gaps[0]
-
-        print(f"  UGF gap: {self.original_ugf:.4f} ({self.original_ugf * 100:.2f}%)")
         self.logger.info(
-            f"Before optimization UGF ({self.fairness_metric}@{self.k}): {self.original_ugf:.4f} ({self.original_ugf * 100:.2f}%)"
+            f"Before optimization UGF ({self.fairness_metric}@{self.k}): {self.original_ugf:.4f}"
         )
 
-        # Calculate epsilon if auto
+        # Calculate epsilon
         if self._epsilon_input == "auto" or self._epsilon_input is None:
             self.epsilon = self.original_ugf / 2
-            print(f"\nDynamic epsilon (1/2 of original gap): {self.epsilon:.4f}")
         else:
             self.epsilon = self._epsilon_input
-
         self.logger.info(f"Epsilon: {self.epsilon:.4f}")
 
-        print("\nProgressive constraint tightening:")
-        print(f"  Start epsilon: {self.original_ugf:.4f} (baseline feasible)")
-        print(f"  Target epsilon: {self.epsilon:.4f}")
+        # Minimal console output
+        print(
+            f"Baseline UGF: {self.original_ugf:.4f} -> Target epsilon: {self.epsilon:.4f}"
+        )
 
         return baseline_solution, baseline_eval
 
@@ -710,24 +692,19 @@ class GAOptimizer:
         Returns:
             Results dictionary with all metrics.
         """
-        print("\n" + "=" * 70)
-        print("After optimization (GA solution):")
         final_df = self._solution_to_dataframe(final_solution)
-
-        # Evaluate overall and per-group metrics
         final_eval = self._evaluate_groups(final_df, self.eval_metric_list)
 
-        metric_str = self._format_metrics(final_eval["overall"])
-        print(f"  Overall: {metric_str}")
-        self.logger.info(f"After optimization overall metric scores     : {metric_str}")
-
-        metric_str = self._format_metrics(final_eval["g1"])
-        print(f"  Group 1 (advantaged): {metric_str}")
-        self.logger.info(f"After optimization group 1 (active) scores   : {metric_str}")
-
-        metric_str = self._format_metrics(final_eval["g2"])
-        print(f"  Group 2 (disadvantaged): {metric_str}")
-        self.logger.info(f"After optimization group 2 (inactive) scores : {metric_str}")
+        # Log to file
+        self.logger.info(
+            f"After optimization overall metric scores     : {self._format_metrics(final_eval['overall'])}"
+        )
+        self.logger.info(
+            f"After optimization group 1 (active) scores   : {self._format_metrics(final_eval['g1'])}"
+        )
+        self.logger.info(
+            f"After optimization group 2 (inactive) scores : {self._format_metrics(final_eval['g2'])}"
+        )
 
         # Final UGF
         final_pop = final_solution[np.newaxis, :, :]
@@ -735,8 +712,6 @@ class GAOptimizer:
             final_pop, target_epsilon
         )
         final_ugf = final_ugf_arr[0]
-
-        print(f"  Final UGF gap: {final_ugf:.4f} ({final_ugf * 100:.2f}%)")
         self.logger.info(f"After optimization UGF: {final_ugf:.4f}")
 
         # UGF improvement
@@ -744,19 +719,19 @@ class GAOptimizer:
         ugf_reduction_pct = (
             (ugf_reduction / self.original_ugf) * 100 if self.original_ugf > 0 else 0
         )
-        print(
-            f"\nUGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}% improvement)"
-        )
         self.logger.info(
             f"UGF reduction: {ugf_reduction:.4f} ({ugf_reduction_pct:.1f}%)"
         )
 
         # Check constraint satisfaction
         constraint_satisfied = final_ugf <= self.epsilon
-        print(
-            f"Fairness constraint (UGF <= {self.epsilon:.4f}): {'SATISFIED' if constraint_satisfied else 'VIOLATED'}"
-        )
         self.logger.info(f"Constraint satisfied: {constraint_satisfied}")
+
+        # Minimal console output
+        status = "✓" if constraint_satisfied else "✗"
+        print(
+            f"Result: UGF {self.original_ugf:.4f} -> {final_ugf:.4f} ({ugf_reduction_pct:.1f}% reduction) [{status}]"
+        )
 
         return {
             "baseline_metrics": baseline_eval["overall"],
@@ -788,14 +763,10 @@ class GAOptimizer:
         baseline_solution, baseline_eval = self._log_baseline_metrics()
 
         # Initialize population
-        print("\nStarting GA optimization (vectorized)...")
         start_time = time.perf_counter()
-
-        # Create initial population: greedy + perturbed greedy
         population = self._create_initial_population(self.population_size)
 
         # Initial evaluation
-        # Start slightly tighter than original to force immediate movement
         start_epsilon = self.original_ugf * self.START_EPSILON_FACTOR
         target_epsilon = self.epsilon
         objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(
@@ -805,12 +776,6 @@ class GAOptimizer:
         best_idx = self._get_best_idx(objectives, violations)
         best_fitness = objectives[best_idx]
         best_solution = population[best_idx].copy()
-        best_ugf = ugf_gaps[best_idx]
-        best_viol = violations[best_idx]
-
-        print(
-            f"\nInitial population: best_obj={best_fitness:.2f}, best_viol={best_viol:.4f}, UGF={best_ugf:.4f}"
-        )
 
         # Track best feasible solution
         best_feasible_solution = None
@@ -827,6 +792,9 @@ class GAOptimizer:
         for gen in range(self.generations):
             # Adaptive penalty adjustment (Bean & Hadj-Alouane method)
             # No generation-based schedule - purely feedback-driven
+            penalty_action = (
+                None  # Track action for logging: "tighten", "relax", or None
+            )
             if (
                 self.adaptive_penalty
                 and len(feasibility_history) >= self.penalty_history_k
@@ -835,9 +803,11 @@ class GAOptimizer:
                 if all(recent_history):  # All recent best were feasible
                     # Tighten epsilon (make constraint harder, push toward target)
                     current_epsilon = current_epsilon / self.penalty_beta1
+                    penalty_action = "tighten"
                 elif not any(recent_history):  # All recent best were infeasible
                     # Relax epsilon (make constraint easier to satisfy)
                     current_epsilon = current_epsilon * self.penalty_beta2
+                    penalty_action = "relax"
 
                 # Bound epsilon to valid range
                 current_epsilon = max(
@@ -888,10 +858,9 @@ class GAOptimizer:
             if gen_best_fitness > best_fitness:
                 best_solution = population[gen_best_idx].copy()
                 best_fitness = gen_best_fitness
-                best_ugf = gen_best_ugf
 
             target_violations = np.maximum(0, ugf_gaps - target_epsilon)
-            feasible_mask = target_violations <= 1e-6
+            feasible_mask = target_violations <= self.FEASIBILITY_TOLERANCE
 
             if feasible_mask.any():
                 feasible_objs = objectives.copy()
@@ -905,47 +874,33 @@ class GAOptimizer:
                     ].copy()
 
             # Progress logging
-            if (gen + 1) % 10 == 0:
-                adapt_status = ""
-                if (
-                    self.adaptive_penalty
-                    and len(feasibility_history) >= self.penalty_history_k
-                ):
-                    recent = feasibility_history[-self.penalty_history_k :]
-                    if all(recent):
-                        adapt_status = " [RELAX]"
-                    elif not any(recent):
-                        adapt_status = " [TIGHT]"
-                print(
-                    f"  Gen {gen + 1}: eps={current_epsilon:.4f}{adapt_status}, mut={self.mutation_rate:.3f}, "
-                    f"best_obj={gen_best_fitness:.2f}, UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}"
-                )
+            adapt_status = (
+                " [TIGHTEN]"
+                if penalty_action == "tighten"
+                else (" [RELAX]" if penalty_action == "relax" else "")
+            )
+            print(
+                f"  Gen {gen + 1}: UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}{adapt_status}"
+            )
 
             # Early stopping check
             if self.early_stopping and best_feasible_solution is not None:
-                print(
-                    f"\n  *** Early stop at gen {gen + 1}: feasible solution found "
-                    f"(UGF={gen_best_ugf:.4f} <= target={target_epsilon:.4f}) ***"
-                )
+                print(f"  Early stop at gen {gen + 1}: feasible solution found")
                 self.logger.info(
                     f"Early stop at generation {gen + 1}: first feasible solution found"
                 )
                 break
 
         cpu_time = time.perf_counter() - start_time
-        print(f"\nGA optimization completed in {cpu_time:.2f} seconds")
         self.logger.info(f"CPU time: {cpu_time:.2f} seconds")
 
-        # Use feasible solution if available (Priority 1)
+        # Use feasible solution if available
         if best_feasible_solution is not None:
             final_solution = best_feasible_solution
-            print("Using best FEASIBLE solution (constraint satisfied)")
         else:
-            # If no feasible solution found, use the best available (min violation)
-            print(
-                "Using best solution from FINAL generation (constraint violated, minimization violation)"
-            )
             final_solution = best_solution
+
+        print(f"Completed in {cpu_time:.2f}s ({self.generations} gens)")
 
         # Log final results and return metrics
         return self._log_final_results(

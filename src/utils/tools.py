@@ -5,6 +5,7 @@ from utils.rank_metrics import ndcg_at_k
 def create_logger(name="result_logger", path="results.log"):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
+    logger.propagate = False  # Prevent output to console via root logger
 
     # Remove existing handlers to prevent duplicates
     if logger.handlers:
