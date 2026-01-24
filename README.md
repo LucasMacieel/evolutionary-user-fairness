@@ -8,7 +8,7 @@ This repository includes the implementation for User-oriented Fairness in Recomm
 
 This implementation extends the original work with:
 
-- **MILP Solver** (`model.py`): Mixed Integer Linear Programming solver using PuLP with HiGHS/SCIP backends
+- **MILP Solver** (`model.py`): Mixed Integer Linear Programming solver using PuLP with HiGHS/CBC backends
 - **Genetic Algorithm Optimizer** (`ga_optimizer.py`): Vectorized GA with:
   - Adaptive penalty mechanism (Bean & Hadj-Alouane method)
   - Tournament selection with Deb's feasibility rules
@@ -39,7 +39,7 @@ pip install -r requirements.txt
 Dependencies:
 - `numpy` - Vectorized computations
 - `pandas` - Data manipulation
-- `pulp` - MILP optimization (HiGHS solver included)
+- `pulp` - MILP optimization (HiGHS/CBC solver included)
 - `matplotlib`, `seaborn` - Visualization
 - `optuna` - Hyperparameter optimization (for tuning module)
 
@@ -77,7 +77,7 @@ python model.py
 Configure in `model.py`:
 - `dataset_name`, `model_name`, `group_name_title`
 - `epsilon`: Fairness constraint threshold (use `"auto"` for dynamic calculation)
-- `solver`: Choose between `"highs"` or `"scip"`
+- `solver`: Choose between `"highs"` or `"cbc"`
 
 ### Genetic Algorithm Optimizer
 

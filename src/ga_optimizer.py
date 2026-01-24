@@ -49,7 +49,6 @@ class GAOptimizer:
         mutation_rate: float = 0.3030,
         crossover_rate: float = 0.9715,
         elitism_count: int = 9,
-        penalty_lambda: float = None,
         seed: int = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
         adaptive_penalty: bool = True,
@@ -79,8 +78,6 @@ class GAOptimizer:
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
         self.elitism_count = elitism_count
-        self._penalty_lambda_input = penalty_lambda
-        self.penalty_lambda = None
 
         # Adaptive penalty settings
         self.adaptive_penalty = adaptive_penalty

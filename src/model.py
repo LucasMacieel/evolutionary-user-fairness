@@ -16,7 +16,7 @@ class UGF(object):
         logger=None,
         model_name="",
         group_name="",
-        solver="highs",  # Default to Highs
+        solver="cbc",  # Default to CBC (supports warm start)
     ):
         """
         Train fairness model
@@ -27,7 +27,7 @@ class UGF(object):
         :param epsilon: the upper bound for difference between groups.
                         Use 'auto' to calculate as half of original UGF gap (paper methodology)
         :param logger: logger for logging info
-        :param solver: Solver to use ('SCIP' or 'Highs'), default='Highs'
+        :param solver: Solver to use ('cbc' or 'highs'), default='cbc'. Both support warm start.
         """
         self.data_loader = data_loader
         self.dataset_name = data_loader.path.split("/")[-1]
@@ -171,6 +171,35 @@ class UGF(object):
         gap = abs(g1_results[0] - g2_results[0])
         return gap
 
+    @staticmethod
+    def _apply_greedy_warm_start(all_vars, group_df_list, k):
+        """
+        Apply warm start by setting initial values to greedy solution (top-K by score per user).
+        Similar to the GA optimizer's _create_greedy_individual approach.
+
+        :param all_vars: dictionary of variable name to LpVariable
+        :param group_df_list: list of dataframes for each group
+        :param k: number of items to select per user
+        """
+        # Combine all data and compute greedy solution
+        all_df = pd.concat(group_df_list, ignore_index=True)
+
+        # For each user, find the top-K items by score
+        greedy_selected = set()
+        for uid, group in all_df.groupby("uid"):
+            # Sort by score descending and take top-K
+            top_k_items = group.nlargest(k, "score")["iid"].tolist()
+            for iid in top_k_items:
+                var_name = f"x{uid}_{iid}"
+                greedy_selected.add(var_name)
+
+        # Set initial values for all variables
+        for var_name, v in all_vars.items():
+            if var_name in greedy_selected:
+                v.setInitialValue(1)
+            else:
+                v.setInitialValue(0)
+
     def train(self):
         """
         Train fairness model
@@ -252,22 +281,24 @@ class UGF(object):
         # Set objective function
         prob += pulp.lpSum(var_score_list)
 
-        # Optimize model with timing
-        import time
+        # Apply warm start: set initial values to greedy solution (similar to GA optimizer)
+        self._apply_greedy_warm_start(all_vars, group_df_list, self.k)
 
-        print(f"Solving optimization problem with PuLP ({self.solver_name} solver)...")
-        start_time = time.perf_counter()
+        # Optimize model
+        print(
+            f"Solving optimization problem with PuLP ({self.solver_name} solver) with warm start..."
+        )
 
-        if self.solver_name.lower() == "scip":
-            prob.solve(pulp.SCIP_CMD(msg=1))
+        if self.solver_name.lower() == "cbc":
+            prob.solve(pulp.PULP_CBC_CMD(msg=1, warmStart=True, keepFiles=True))
         elif self.solver_name.lower() == "highs":
-            prob.solve(pulp.HiGHS_CMD(msg=1))
+            prob.solve(pulp.HiGHS_CMD(msg=1, warmStart=True))
         else:
-            print(f"Warning: Unknown solver '{self.solver_name}', defaulting to SCIP")
-            prob.solve(pulp.SCIP_CMD(msg=1))
+            print(f"Warning: Unknown solver '{self.solver_name}', defaulting to CBC")
+            prob.solve(pulp.PULP_CBC_CMD(msg=1, warmStart=True, keepFiles=True))
 
-        end_time = time.perf_counter()
-        cpu_time = end_time - start_time
+        # Get solver's internal timing (more accurate than external timing)
+        cpu_time = prob.solutionTime
 
         print(f"\nStatus: {pulp.LpStatus[prob.status]}")
         print(f"CPU time: {cpu_time:.2f} seconds")
@@ -350,10 +381,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Health-rand"]
+    datasets = ["5Grocery-rand", "5Beauty-rand", "5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["biasedMF"]
+    models = ["biasedMF", "NCF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [
