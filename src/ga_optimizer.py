@@ -28,18 +28,12 @@ class GAOptimizer:
     Uses vectorized NumPy operations for performance.
     """
 
-    # Class constants
-    FEASIBILITY_TOLERANCE = 1e-9
-    START_EPSILON_FACTOR = 0.99
-    INIT_MUTATION_RATE = 0.2
-
     def __init__(
         self,
         data_loader: DataLoader,
         k: int = 10,
         eval_metric_list: List[str] = None,
         fairness_metric: str = "f1",
-        epsilon: float = None,
         logger=None,
         model_name: str = "",
         group_name: str = "",
@@ -51,12 +45,9 @@ class GAOptimizer:
         elitism_count: int = 9,
         seed: int = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
-        adaptive_penalty: bool = True,
         penalty_beta1: float = 2.54,  # Tightening factor when all feasible
         penalty_beta2: float = 3.00,  # Relaxation factor when all infeasible
         penalty_history_k: int = 9,  # Lookback window for feasibility history
-        # Early stopping parameters
-        early_stopping: bool = True,  # Halt immediately when feasible solution found
         # Pre-built data for faster initialization (use build_vectorized_data())
         prebuilt_data: Dict = None,
     ):
@@ -66,8 +57,7 @@ class GAOptimizer:
         self.k = k
         self.eval_metric_list = eval_metric_list or ["ndcg@10", "f1@10"]
         self.fairness_metric = fairness_metric
-        self._epsilon_input = epsilon
-        self.epsilon = None
+        self.epsilon = None  # Calculated dynamically as UGF/2
         self.original_ugf = None
         self.model_name = model_name
         self.group_name = group_name
@@ -79,12 +69,10 @@ class GAOptimizer:
         self.crossover_rate = crossover_rate
         self.elitism_count = elitism_count
 
-        # Adaptive penalty settings
-        self.adaptive_penalty = adaptive_penalty
+        # Adaptive penalty settings (always enabled)
         self.penalty_beta1 = penalty_beta1
         self.penalty_beta2 = penalty_beta2
         self.penalty_history_k = penalty_history_k
-        self.early_stopping = early_stopping
 
         if seed is not None:
             random.seed(seed)
@@ -336,7 +324,7 @@ class GAOptimizer:
         # Perturb the population (except the first one which stays pure greedy)
         # We apply mutations to diversify the population
         # Use a slightly higher rate for initialization diversity
-        mutate_mask = np.random.random((size, self.n_users)) < self.INIT_MUTATION_RATE
+        mutate_mask = np.random.random((size, self.n_users)) < self.mutation_rate
 
         for i in range(1, size):  # Skip index 0 to keep one pure greedy
             for u in range(self.n_users):
@@ -553,14 +541,12 @@ class GAOptimizer:
                 # Metrics for A
                 obj_A = cand_obj[curr_idx]
                 viol_A = cand_viol[curr_idx]
-                is_feas_A = (
-                    viol_A <= self.FEASIBILITY_TOLERANCE
-                )  # Treat effectively 0 as feasible to handle float precision
+                is_feas_A = viol_A == 0
 
                 # Metrics for B
                 obj_B = cand_obj[challenger_idx]
                 viol_B = cand_viol[challenger_idx]
-                is_feas_B = viol_B <= self.FEASIBILITY_TOLERANCE
+                is_feas_B = viol_B == 0
 
                 if is_feas_A and is_feas_B:
                     # Both feasible: better objective wins
@@ -661,11 +647,8 @@ class GAOptimizer:
             f"Before optimization UGF ({self.fairness_metric}@{self.k}): {self.original_ugf:.4f}"
         )
 
-        # Calculate epsilon
-        if self._epsilon_input == "auto" or self._epsilon_input is None:
-            self.epsilon = self.original_ugf / 2
-        else:
-            self.epsilon = self._epsilon_input
+        # Calculate epsilon dynamically as UGF/2
+        self.epsilon = self.original_ugf / 2
         self.logger.info(f"Epsilon: {self.epsilon:.4f}")
 
         # Minimal console output
@@ -751,10 +734,9 @@ class GAOptimizer:
             f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
             f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
         )
-        if self.adaptive_penalty:
-            self.logger.info(
-                f"Adaptive Penalty | beta1:{self.penalty_beta1} | beta2:{self.penalty_beta2} | k:{self.penalty_history_k}"
-            )
+        self.logger.info(
+            f"Adaptive Penalty | beta1:{self.penalty_beta1} | beta2:{self.penalty_beta2} | k:{self.penalty_history_k}"
+        )
 
         # Evaluate baseline and set epsilon
         baseline_solution, baseline_eval = self._log_baseline_metrics()
@@ -764,7 +746,7 @@ class GAOptimizer:
         population = self._create_initial_population(self.population_size)
 
         # Initial evaluation
-        start_epsilon = self.original_ugf * self.START_EPSILON_FACTOR
+        start_epsilon = self.original_ugf
         target_epsilon = self.epsilon
         objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(
             population, start_epsilon
@@ -792,10 +774,7 @@ class GAOptimizer:
             penalty_action = (
                 None  # Track action for logging: "tighten", "relax", or None
             )
-            if (
-                self.adaptive_penalty
-                and len(feasibility_history) >= self.penalty_history_k
-            ):
+            if len(feasibility_history) >= self.penalty_history_k:
                 recent_history = feasibility_history[-self.penalty_history_k :]
                 if all(recent_history):  # All recent best were feasible
                     # Tighten epsilon (make constraint harder, push toward target)
@@ -849,7 +828,7 @@ class GAOptimizer:
             gen_best_viol = violations[gen_best_idx]
 
             # Update feasibility history for adaptive penalty
-            gen_best_is_feasible = gen_best_viol <= self.FEASIBILITY_TOLERANCE
+            gen_best_is_feasible = gen_best_viol == 0
             feasibility_history.append(gen_best_is_feasible)
 
             if gen_best_fitness > best_fitness:
@@ -857,7 +836,7 @@ class GAOptimizer:
                 best_fitness = gen_best_fitness
 
             target_violations = np.maximum(0, ugf_gaps - target_epsilon)
-            feasible_mask = target_violations <= self.FEASIBILITY_TOLERANCE
+            feasible_mask = target_violations == 0
 
             if feasible_mask.any():
                 feasible_objs = objectives.copy()
@@ -880,8 +859,8 @@ class GAOptimizer:
                 f"  Gen {gen + 1}: UGF={gen_best_ugf:.4f}, viol={gen_best_viol:.4f}{adapt_status}"
             )
 
-            # Early stopping check
-            if self.early_stopping and best_feasible_solution is not None:
+            # Early stopping: halt when feasible solution found
+            if best_feasible_solution is not None:
                 print(f"  Early stop at gen {gen + 1}: feasible solution found")
                 self.logger.info(
                     f"Early stop at generation {gen + 1}: first feasible solution found"
@@ -913,7 +892,6 @@ if __name__ == "__main__":
     import os
 
     ############### Configuration ###########
-    epsilon = "auto"  # Dynamic epsilon (paper methodology)
     dataset_folder = "../dataset"
 
     # All available datasets
@@ -938,7 +916,7 @@ if __name__ == "__main__":
             "max_0.05",
             "max_0.05_price_active_test_ratings.txt",
             "max_0.05_price_inactive_test_ratings.txt",
-        )
+        ),
     ]
 
     ga_seed = 42
@@ -1005,7 +983,6 @@ if __name__ == "__main__":
                         k=10,
                         eval_metric_list=metrics_list,
                         fairness_metric="f1",
-                        epsilon=epsilon,
                         logger=logger,
                         model_name=model_name,
                         group_name=group_name,

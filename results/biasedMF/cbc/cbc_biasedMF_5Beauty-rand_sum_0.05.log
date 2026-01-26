@@ -1,0 +1,15 @@
+Model:biasedMF | Dataset:dataset\5Beauty-rand | Group:sum_0.05 |  Epsilon=None | K=10
+Before optimization overall scores           : ndcg@10=0.4325 f1@10=0.1427 
+Before optimization group 1 (active) scores  : ndcg@10=0.6594 f1@10=0.2976 
+Before optimization group 2 (inactive) scores: ndcg@10=0.4140 f1@10=0.1301 
+Before optimization UGF (f1@10): 0.1675 (16.75%)
+Dynamic epsilon: original_gap=0.1675, epsilon=0.0838
+Solver status: Optimal
+CPU time: 260.91 seconds
+After optimization overall metric scores     : ndcg@10=0.4377 f1@10=0.1474 
+After optimization group 1 (active) scores   : ndcg@10=0.5742 f1@10=0.2248 
+After optimization group 2 (inactive) scores : ndcg@10=0.4266 f1@10=0.1411 
+After optimization UGF (f1@10): 0.0838 (8.38%)
+UGF reduction: 0.0838 (50.0% improvement)
+
+

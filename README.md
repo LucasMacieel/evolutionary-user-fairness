@@ -14,7 +14,40 @@ This implementation extends the original work with:
   - Tournament selection with Deb's feasibility rules
 - **Hyperparameter Tuning** (`ga_hyperparameter_tuning.py`): Optuna-based TPE optimization
 - **Statistical Evaluation** (`ga_statistical_evaluation.py`): Multi-run statistical analysis (30 runs by default)
-- **Visualization** (`plotter.py`): Result plotting utilities
+
+## Project Status
+
+### ✅ Completed Components
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| MILP Solver | ✅ Complete | PuLP-based solver with HiGHS/CBC backends, warm start support |
+| GA Optimizer | ✅ Complete | Vectorized NumPy implementation, adaptive penalty (Bean & Hadj-Alouane), Deb's feasibility rules |
+| Hyperparameter Tuning | ✅ Complete | Optuna TPE optimization with pruning and caching |
+| Statistical Evaluation | ✅ Complete | 30-run analysis with 95% CI, IQR, and convergence tracking |
+| Visualization | ✅ Complete | Convergence plots, solver comparison, statistical summaries |
+
+### 📊 Experimental Results
+
+Results are available for the following configurations:
+
+- **Models**: NCF, biasedMF
+- **Datasets**: 5Beauty-rand (Amazon)
+- **Groupings**: count, max_price, sum_price
+- **Solvers**: HiGHS, CBC (MILP) + GA
+
+Statistical evaluation results include:
+- Mean, standard deviation, median
+- 95% confidence intervals
+- Inter-quartile range (IQR)
+- Success rate metrics
+
+### 🔧 Key GA Features
+
+- **Perturbed Greedy Initialization**: High-quality starting population
+- **Smart Swap Mutation**: Fairness-aware repair bias
+- **Tournament Selection**: Deb's feasibility rules for constraint handling
+- **Adaptive Penalty**: Dynamic penalty coefficient based on feasibility history
 
 ## Reference
 
@@ -76,7 +109,7 @@ python model.py
 
 Configure in `model.py`:
 - `dataset_name`, `model_name`, `group_name_title`
-- `epsilon`: Fairness constraint threshold (use `"auto"` for dynamic calculation)
+- `epsilon`: Fairness constraint threshold
 - `solver`: Choose between `"highs"` or `"cbc"`
 
 ### Genetic Algorithm Optimizer
@@ -89,10 +122,10 @@ python ga_optimizer.py
 ```
 
 Key parameters:
-- `population_size`: Population size (default: 50)
-- `generations`: Number of generations (default: 100)
-- `mutation_rate_max/min`: Adaptive mutation rate range
-- `epsilon`: Fairness constraint (use `"auto"` for dynamic calculation)
+- `population_size`: Population size
+- `generations`: Number of generations
+- `mutation_rate`: Mutation rate
+- `epsilon`: Fairness constraint
 
 ### Hyperparameter Tuning
 
@@ -129,10 +162,9 @@ Results include mean, std, median, 95% CI, IQR, and success rate for all metrics
 ## Results
 
 Results are saved in `./results/` with subdirectories:
-- `highs/`, `scip/`: MILP solver outputs
-- `ga/`, `newGA/`: GA optimizer outputs
+- `highs/`, `cbc/`: MILP solver outputs
 - `tuning/`: Hyperparameter tuning results
-- `statistical/`: Statistical evaluation results
+- `statistical/`: GA Statistical evaluation results
 
 ## Project Structure
 
@@ -146,7 +178,6 @@ user-fairness/
 │   ├── ga_hyperparameter_tuning.py  # Optuna hyperparameter tuning
 │   ├── ga_statistical_evaluation.py # Statistical evaluation module
 │   ├── data_loader.py         # Data loading utilities
-│   ├── plotter.py             # Visualization utilities
 │   ├── cache/                 # Vectorized data cache
 │   └── utils/
 │       └── tools.py           # Helper functions

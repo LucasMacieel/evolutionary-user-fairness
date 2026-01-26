@@ -1,0 +1,29 @@
+{
+  "best_params": {
+    "population_size": 10,
+    "mutation_rate": 0.30304080922281096,
+    "crossover_rate": 0.9714817822262315,
+    "elitism_count": 19,
+    "penalty_beta1": 2.5366102210915535,
+    "penalty_beta2": 2.996738813715406,
+    "penalty_history_k": 9
+  },
+  "best_score": 22.947542190551758,
+  "best_trial_number": 37,
+  "best_trial_user_attrs": {
+    "best_fitness": 458340.46875,
+    "final_f1": 0.107810840290497,
+    "final_ugf": 0.10166227072477341,
+    "cpu_time": 15.383128099958412,
+    "constraint_satisfied": true,
+    "combined_score": 22.947542190551758,
+    "normalized_quality": 45.83404541015625,
+    "speed_score": 0.061038404503627026
+  },
+  "n_trials": 50,
+  "n_feasible_trials": 45,
+  "elapsed_time": 3174.02059510001,
+  "study_name": "ga_tuning_NCF_0.05_count",
+  "model_name": "NCF",
+  "group_name": "0.05_count"
+}

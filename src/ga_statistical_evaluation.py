@@ -48,22 +48,17 @@ class GAStatisticalEvaluator:
         groupings: List[Tuple[str, str, str]] = None,
         dataset_folder: str = "../dataset",
         k: int = 10,
-        epsilon: str = "auto",
         verbose: bool = True,
         # GA parameters (matching latest ga_optimizer.py defaults)
         population_size: int = 10,
-        generations: int = 200,
+        generations: int = 1000,
         mutation_rate: float = 0.3030,
         crossover_rate: float = 0.9715,
         elitism_count: int = 9,
-        penalty_lambda: float = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
-        adaptive_penalty: bool = True,
         penalty_beta1: float = 2.54,
         penalty_beta2: float = 3.00,
         penalty_history_k: int = 9,
-        # Early stopping
-        early_stopping: bool = True,
     ):
         """
         Initialize the statistical evaluator.
@@ -76,25 +71,20 @@ class GAStatisticalEvaluator:
             groupings: List of (group_name, g1_file, g2_file) tuples (None = all)
             dataset_folder: Path to dataset folder
             k: Top-K for recommendations
-            epsilon: Epsilon for fairness constraint ('auto' recommended)
             verbose: Print progress to console
             population_size: GA population size
             generations: Number of GA generations
             mutation_rate: Mutation rate for GA
             crossover_rate: Crossover rate for GA
             elitism_count: Number of elites to preserve
-            penalty_lambda: Penalty coefficient (None = auto-calculate)
-            adaptive_penalty: Enable adaptive penalty (Bean & Hadj-Alouane)
             penalty_beta1: Tightening factor when all feasible
             penalty_beta2: Relaxation factor when all infeasible
             penalty_history_k: Lookback window for feasibility history
-            early_stopping: Halt when feasible solution found
         """
         self.n_runs = n_runs
         self.output_dir = output_dir
         self.dataset_folder = dataset_folder
         self.k = k
-        self.epsilon = epsilon
         self.verbose = verbose
 
         # GA parameters
@@ -103,12 +93,9 @@ class GAStatisticalEvaluator:
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
         self.elitism_count = elitism_count
-        self.penalty_lambda = penalty_lambda
-        self.adaptive_penalty = adaptive_penalty
         self.penalty_beta1 = penalty_beta1
         self.penalty_beta2 = penalty_beta2
         self.penalty_history_k = penalty_history_k
-        self.early_stopping = early_stopping
 
         # Default configurations (matching ga_optimizer.py main block)
         self.datasets = datasets or ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
@@ -169,7 +156,6 @@ class GAStatisticalEvaluator:
             k=self.k,
             eval_metric_list=self.metrics_list,
             fairness_metric="f1",
-            epsilon=self.epsilon,
             logger=logger,
             model_name=model_name,
             group_name=group_name,
@@ -181,14 +167,10 @@ class GAStatisticalEvaluator:
             mutation_rate=self.mutation_rate,
             crossover_rate=self.crossover_rate,
             elitism_count=self.elitism_count,
-            penalty_lambda=self.penalty_lambda,
             # Adaptive penalty parameters
-            adaptive_penalty=self.adaptive_penalty,
             penalty_beta1=self.penalty_beta1,
             penalty_beta2=self.penalty_beta2,
             penalty_history_k=self.penalty_history_k,
-            # Early stopping
-            early_stopping=self.early_stopping,
         )
 
         # Run optimization

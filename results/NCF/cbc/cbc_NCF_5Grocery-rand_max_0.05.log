@@ -1,0 +1,15 @@
+Model:NCF | Dataset:dataset\5Grocery-rand | Group:max_0.05 |  Epsilon=None | K=10
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451 
+Before optimization group 1 (active) scores  : ndcg@10=0.5148 f1@10=0.2284 
+Before optimization group 2 (inactive) scores: ndcg@10=0.3807 f1@10=0.1398 
+Before optimization UGF (f1@10): 0.0886 (8.86%)
+Dynamic epsilon: original_gap=0.0886, epsilon=0.0443
+Solver status: Optimal
+CPU time: 102.84 seconds
+After optimization overall metric scores     : ndcg@10=0.3899 f1@10=0.1465 
+After optimization group 1 (active) scores   : ndcg@10=0.4587 f1@10=0.1882 
+After optimization group 2 (inactive) scores : ndcg@10=0.3855 f1@10=0.1439 
+After optimization UGF (f1@10): 0.0443 (4.43%)
+UGF reduction: 0.0443 (50.0% improvement)
+
+
