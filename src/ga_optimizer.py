@@ -39,15 +39,15 @@ class GAOptimizer:
         group_name: str = "",
         # GA parameters (optimized via Optuna hyperparameter tuning)
         population_size: int = 10,
-        generations: int = 200,
-        mutation_rate: float = 0.3030,
-        crossover_rate: float = 0.9715,
-        elitism_count: int = 9,
+        generations: int = 1000,
+        mutation_rate: float = 0.3145,
+        crossover_rate: float = 0.5857,
+        elitism_count: int = 7,
         seed: int = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
-        penalty_beta1: float = 2.54,  # Tightening factor when all feasible
-        penalty_beta2: float = 3.00,  # Relaxation factor when all infeasible
-        penalty_history_k: int = 9,  # Lookback window for feasibility history
+        penalty_beta1: float = 2.25,  # Tightening factor when all feasible
+        penalty_beta2: float = 2.31,  # Relaxation factor when all infeasible
+        penalty_history_k: int = 8,  # Lookback window for feasibility history
         # Pre-built data for faster initialization (use build_vectorized_data())
         prebuilt_data: Dict = None,
     ):
@@ -895,10 +895,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
+    datasets = ["5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["NCF", "biasedMF"]
+    models = ["NCF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [

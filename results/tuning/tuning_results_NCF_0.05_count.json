@@ -1,28 +1,26 @@
 {
   "best_params": {
     "population_size": 10,
-    "mutation_rate": 0.30304080922281096,
-    "crossover_rate": 0.9714817822262315,
-    "elitism_count": 19,
-    "penalty_beta1": 2.5366102210915535,
-    "penalty_beta2": 2.996738813715406,
-    "penalty_history_k": 9
+    "mutation_rate": 0.3145026097866015,
+    "crossover_rate": 0.585668037562274,
+    "elitism_count": 7,
+    "penalty_beta1": 2.250406579338134,
+    "penalty_beta2": 2.3054685667135266,
+    "penalty_history_k": 8
   },
-  "best_score": 22.947542190551758,
-  "best_trial_number": 37,
+  "best_score": 0.06658869929055825,
+  "best_trial_number": 13,
   "best_trial_user_attrs": {
-    "best_fitness": 458340.46875,
-    "final_f1": 0.107810840290497,
-    "final_ugf": 0.10166227072477341,
-    "cpu_time": 15.383128099958412,
+    "best_fitness": 452621.46875,
+    "final_f1": 0.10763068656146138,
+    "final_ugf": 0.10695888102054596,
+    "cpu_time": 14.017563199973665,
     "constraint_satisfied": true,
-    "combined_score": 22.947542190551758,
-    "normalized_quality": 45.83404541015625,
-    "speed_score": 0.061038404503627026
+    "speed_score": 0.06658869929055825
   },
   "n_trials": 50,
-  "n_feasible_trials": 45,
-  "elapsed_time": 3174.02059510001,
+  "n_feasible_trials": 50,
+  "elapsed_time": 3209.5089109999826,
   "study_name": "ga_tuning_NCF_0.05_count",
   "model_name": "NCF",
   "group_name": "0.05_count"
