@@ -237,6 +237,17 @@ class GAOptimizer:
         self.n_g1 = data["n_g1"]
         self.n_g2 = data["n_g2"]
 
+        # Create items_per_user array for efficient indexing
+        self.items_per_user_arr = np.array(
+            [self.items_per_user[uid] for uid in self.user_ids], dtype=np.int32
+        )
+
+        # Create valid items mask for efficient constraint checking
+        # valid_items_mask[u, i] = True if item i is valid for user u
+        self.valid_items_mask = np.zeros((self.n_users, self.n_items), dtype=bool)
+        for u in range(self.n_users):
+            self.valid_items_mask[u, : self.items_per_user_arr[u]] = True
+
     def _calculate_fitness_batch(
         self, population: np.ndarray, current_epsilon: float
     ) -> Tuple[np.ndarray, np.ndarray]:
@@ -329,8 +340,11 @@ class GAOptimizer:
         for i in range(1, size):  # Skip index 0 to keep one pure greedy
             for u in range(self.n_users):
                 if mutate_mask[i, u]:
-                    selected = np.where(population[i, u] == 1)[0]
-                    unselected = np.where(population[i, u] == 0)[0]
+                    n_valid = self.items_per_user_arr[u]
+                    # Only consider valid items (not padding)
+                    user_slice = population[i, u, :n_valid]
+                    selected = np.where(user_slice == 1)[0]
+                    unselected = np.where(user_slice == 0)[0]
 
                     if len(selected) > 0 and len(unselected) > 0:
                         # Random swap for initialization (unbiased exploration)
@@ -342,12 +356,16 @@ class GAOptimizer:
         return population
 
     def _create_greedy_individual(self) -> np.ndarray:
-        """Create greedy individual (top-K by score per user)."""
+        """Create greedy individual (top-K by score per user, only from valid items)."""
         individual = np.zeros((self.n_users, self.n_items), dtype=np.int8)
 
         for u in range(self.n_users):
-            top_k = np.argsort(self.scores_matrix[u])[-self.k :]
-            individual[u, top_k] = 1
+            # Only consider valid items (not padding)
+            n_valid = self.items_per_user_arr[u]
+            valid_scores = self.scores_matrix[u, :n_valid]
+            # Get top-k indices within valid range
+            top_k_local = np.argsort(valid_scores)[-self.k :]
+            individual[u, top_k_local] = 1
 
         return individual
 
@@ -421,8 +439,11 @@ class GAOptimizer:
         for i in range(pop_size):
             for u in range(self.n_users):
                 if mutate_mask[i, u]:
-                    selected = np.where(mutated[i, u] == 1)[0]
-                    unselected = np.where(mutated[i, u] == 0)[0]
+                    n_valid = self.items_per_user_arr[u]
+                    # Only consider valid items (not padding)
+                    user_slice = mutated[i, u, :n_valid]
+                    selected = np.where(user_slice == 1)[0]
+                    unselected = np.where(user_slice == 0)[0]
 
                     if len(selected) > 0 and len(unselected) > 0:
                         # Determine strategy for this user
@@ -686,12 +707,16 @@ class GAOptimizer:
             f"After optimization group 2 (inactive) scores : {self._format_metrics(final_eval['g2'])}"
         )
 
-        # Final UGF
-        final_pop = final_solution[np.newaxis, :, :]
-        _, _, final_ugf_arr, _ = self._calculate_fitness_batch(
-            final_pop, target_epsilon
-        )
-        final_ugf = final_ugf_arr[0]
+        # Final UGF: Calculate from the actual evaluated group scores
+        # The fairness metric is f1@k, so find its index in the metrics list
+        fairness_metric_key = f"{self.fairness_metric}@{self.k}"
+        metric_idx = self.eval_metric_list.index(fairness_metric_key)
+
+        # UGF = |G1_score - G2_score| for the fairness metric
+        g1_fairness_score = final_eval["g1"][metric_idx]
+        g2_fairness_score = final_eval["g2"][metric_idx]
+        final_ugf = abs(g1_fairness_score - g2_fairness_score)
+
         self.logger.info(f"After optimization UGF: {final_ugf:.4f}")
 
         # UGF improvement
@@ -895,10 +920,10 @@ if __name__ == "__main__":
     dataset_folder = "../dataset"
 
     # All available datasets
-    datasets = ["5Health-rand"]
+    datasets = ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
 
     # All available models (must have corresponding *_rank.csv files)
-    models = ["NCF"]
+    models = ["biasedMF", "NCF"]
 
     # Grouping methods: (group_name, group_1_suffix, group_2_suffix)
     grouping_methods = [

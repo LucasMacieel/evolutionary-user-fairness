@@ -240,16 +240,21 @@ class UGF(object):
             "Before optimization group 2 (inactive) scores",
         )
 
-        # Calculate and log original UGF
+        # Calculate and log original UGF for both f1 and ndcg
         fairness_metric_k = self.fairness_metric + "@" + str(self.k)
         original_ugf = self._calculate_ugf_gap(
             group_df_list[0], group_df_list[1], fairness_metric_k
         )
+        # Calculate UGF for ndcg@10 (Group 1 - Group 2)
+        ndcg_metric_k = "ndcg@" + str(self.k)
+        original_ugf_ndcg = self._calculate_ugf_gap(
+            group_df_list[0], group_df_list[1], ndcg_metric_k
+        )
         print(
-            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
+            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%) | UGF ({ndcg_metric_k}): {original_ugf_ndcg:.4f} ({original_ugf_ndcg * 100:.2f}%)"
         )
         self.logger.info(
-            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%)"
+            f"Before optimization UGF ({fairness_metric_k}): {original_ugf:.4f} ({original_ugf * 100:.2f}%) | UGF ({ndcg_metric_k}): {original_ugf_ndcg:.4f} ({original_ugf_ndcg * 100:.2f}%)"
         )
 
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
@@ -333,15 +338,19 @@ class UGF(object):
             "After optimization group 2 (inactive) scores ",
         )
 
-        # Calculate and log optimized UGF
+        # Calculate and log optimized UGF for both f1 and ndcg
         optimized_ugf = self._calculate_ugf_gap(
             group_df_list[0], group_df_list[1], fairness_metric_k
         )
+        # Calculate UGF for ndcg@10 (Group 1 - Group 2)
+        optimized_ugf_ndcg = self._calculate_ugf_gap(
+            group_df_list[0], group_df_list[1], ndcg_metric_k
+        )
         print(
-            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%)"
+            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%) | UGF ({ndcg_metric_k}): {optimized_ugf_ndcg:.4f} ({optimized_ugf_ndcg * 100:.2f}%)"
         )
         self.logger.info(
-            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%)"
+            f"After optimization UGF ({fairness_metric_k}): {optimized_ugf:.4f} ({optimized_ugf * 100:.2f}%) | UGF ({ndcg_metric_k}): {optimized_ugf_ndcg:.4f} ({optimized_ugf_ndcg * 100:.2f}%)"
         )
 
         # Log UGF improvement

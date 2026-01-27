@@ -30,8 +30,12 @@ def evaluation_methods(df, metrics):
     data_df = df.copy(deep=True)
     data_df["q*s"] = data_df["q"] * data_df["score"]
 
-    # Pre-sort once for all metrics
-    tmp_df = data_df.sort_values(by="q*s", ascending=False, ignore_index=True)
+    # Pre-sort: first by q (descending) to ensure selected items come first,
+    # then by q*s (descending) as tie-breaker among selected items.
+    # This ensures that when exactly k items have q=1, they will be in top-k.
+    tmp_df = data_df.sort_values(
+        by=["q", "q*s"], ascending=[False, False], ignore_index=True
+    )
 
     # Add row number within each user group (for top-k selection)
     tmp_df["rank_in_group"] = tmp_df.groupby("uid").cumcount()

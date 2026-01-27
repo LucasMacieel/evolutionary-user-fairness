@@ -2,14 +2,14 @@ Model:NCF | Dataset:dataset\5Health-rand | Group:0.05_count |  Epsilon=None | K=
 Before optimization overall scores           : ndcg@10=0.3355 f1@10=0.1220 
 Before optimization group 1 (active) scores  : ndcg@10=0.6172 f1@10=0.3184 
 Before optimization group 2 (inactive) scores: ndcg@10=0.3091 f1@10=0.1036 
-Before optimization UGF (f1@10): 0.2148 (21.48%)
+Before optimization UGF (f1@10): 0.2148 (21.48%) | UGF (ndcg@10): 0.3081 (30.81%)
 Dynamic epsilon: original_gap=0.2148, epsilon=0.1074
 Solver status: Optimal
 CPU time: 265.75 seconds
 After optimization overall metric scores     : ndcg@10=0.3409 f1@10=0.1261 
 After optimization group 1 (active) scores   : ndcg@10=0.5057 f1@10=0.2243 
 After optimization group 2 (inactive) scores : ndcg@10=0.3255 f1@10=0.1169 
-After optimization UGF (f1@10): 0.1074 (10.74%)
+After optimization UGF (f1@10): 0.1074 (10.74%) | UGF (ndcg@10): 0.1802 (18.02%)
 UGF reduction: 0.1074 (50.0% improvement)
 
 

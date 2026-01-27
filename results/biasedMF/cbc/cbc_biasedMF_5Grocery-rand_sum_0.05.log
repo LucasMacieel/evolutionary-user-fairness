@@ -2,14 +2,14 @@ Model:biasedMF | Dataset:dataset\5Grocery-rand | Group:sum_0.05 |  Epsilon=None 
 Before optimization overall scores           : ndcg@10=0.4508 f1@10=0.1578 
 Before optimization group 1 (active) scores  : ndcg@10=0.6629 f1@10=0.3385 
 Before optimization group 2 (inactive) scores: ndcg@10=0.4316 f1@10=0.1415 
-Before optimization UGF (f1@10): 0.1970 (19.70%)
+Before optimization UGF (f1@10): 0.1970 (19.70%) | UGF (ndcg@10): 0.2313 (23.13%)
 Dynamic epsilon: original_gap=0.1970, epsilon=0.0985
 Solver status: Optimal
 CPU time: 548.39 seconds
 After optimization overall metric scores     : ndcg@10=0.4557 f1@10=0.1599 
 After optimization group 1 (active) scores   : ndcg@10=0.5907 f1@10=0.2503 
 After optimization group 2 (inactive) scores : ndcg@10=0.4435 f1@10=0.1517 
-After optimization UGF (f1@10): 0.0986 (9.86%)
+After optimization UGF (f1@10): 0.0986 (9.86%) | UGF (ndcg@10): 0.1472 (14.72%)
 UGF reduction: 0.0985 (50.0% improvement)
 
 
