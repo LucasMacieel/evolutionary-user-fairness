@@ -180,6 +180,12 @@ class GAStatisticalEvaluator:
             "run_id": run_id,
             "final_ugf": float(results["final_ugf"]),
             "original_ugf": float(results["original_ugf"]),
+            "final_ugf_ndcg": float(results["final_ugf_ndcg"])
+            if results.get("final_ugf_ndcg") is not None
+            else None,
+            "original_ugf_ndcg": float(results["original_ugf_ndcg"])
+            if results.get("original_ugf_ndcg") is not None
+            else None,
             "epsilon": float(results["epsilon"]),
             "constraint_satisfied": bool(results["constraint_satisfied"]),
             "cpu_time": float(results["cpu_time"]),
@@ -187,6 +193,25 @@ class GAStatisticalEvaluator:
             "final_f1": float(results["final_metrics"][1]),  # f1@10
             "baseline_ndcg": float(results["baseline_metrics"][0]),
             "baseline_f1": float(results["baseline_metrics"][1]),
+            # Group 1 (active) scores
+            "final_g1_f1": float(results["final_g1_f1"]),
+            "final_g1_ndcg": float(results["final_g1_ndcg"])
+            if results.get("final_g1_ndcg") is not None
+            else None,
+            "baseline_g1_f1": float(results["baseline_g1_f1"]),
+            "baseline_g1_ndcg": float(results["baseline_g1_ndcg"])
+            if results.get("baseline_g1_ndcg") is not None
+            else None,
+            # Group 2 (inactive) scores
+            "final_g2_f1": float(results["final_g2_f1"]),
+            "final_g2_ndcg": float(results["final_g2_ndcg"])
+            if results.get("final_g2_ndcg") is not None
+            else None,
+            "baseline_g2_f1": float(results["baseline_g2_f1"]),
+            "baseline_g2_ndcg": float(results["baseline_g2_ndcg"])
+            if results.get("baseline_g2_ndcg") is not None
+            else None,
+            # Reduction percentages
             "ugf_reduction": float(results["original_ugf"] - results["final_ugf"]),
             "ugf_reduction_pct": float(
                 (results["original_ugf"] - results["final_ugf"])
@@ -195,6 +220,15 @@ class GAStatisticalEvaluator:
                 if results["original_ugf"] > 0
                 else 0
             ),
+            "ugf_ndcg_reduction_pct": float(
+                (results["original_ugf_ndcg"] - results["final_ugf_ndcg"])
+                / results["original_ugf_ndcg"]
+                * 100
+                if results.get("original_ugf_ndcg") and results["original_ugf_ndcg"] > 0
+                else 0
+            )
+            if results.get("original_ugf_ndcg") is not None
+            else None,
         }
 
     def _calculate_statistics(self, runs: List[Dict]) -> Dict:
@@ -219,6 +253,22 @@ class GAStatisticalEvaluator:
             "final_ndcg": [r["final_ndcg"] for r in runs],
             "ugf_reduction_pct": [r["ugf_reduction_pct"] for r in runs],
         }
+
+        # Add NDCG UGF metrics if available
+        if runs[0].get("final_ugf_ndcg") is not None:
+            metrics["final_ugf_ndcg"] = [r["final_ugf_ndcg"] for r in runs]
+        if runs[0].get("ugf_ndcg_reduction_pct") is not None:
+            metrics["ugf_ndcg_reduction_pct"] = [
+                r["ugf_ndcg_reduction_pct"] for r in runs
+            ]
+
+        # Add group 1 and group 2 scores
+        metrics["final_g1_f1"] = [r["final_g1_f1"] for r in runs]
+        metrics["final_g2_f1"] = [r["final_g2_f1"] for r in runs]
+        if runs[0].get("final_g1_ndcg") is not None:
+            metrics["final_g1_ndcg"] = [r["final_g1_ndcg"] for r in runs]
+        if runs[0].get("final_g2_ndcg") is not None:
+            metrics["final_g2_ndcg"] = [r["final_g2_ndcg"] for r in runs]
 
         stats = {}
 
@@ -269,6 +319,18 @@ class GAStatisticalEvaluator:
         stats["epsilon"] = float(runs[0]["epsilon"])
         stats["baseline_f1"] = float(runs[0]["baseline_f1"])
         stats["baseline_ndcg"] = float(runs[0]["baseline_ndcg"])
+
+        # Add NDCG UGF baseline if available
+        if runs[0].get("original_ugf_ndcg") is not None:
+            stats["original_ugf_ndcg"] = float(runs[0]["original_ugf_ndcg"])
+
+        # Add baseline group scores
+        stats["baseline_g1_f1"] = float(runs[0]["baseline_g1_f1"])
+        stats["baseline_g2_f1"] = float(runs[0]["baseline_g2_f1"])
+        if runs[0].get("baseline_g1_ndcg") is not None:
+            stats["baseline_g1_ndcg"] = float(runs[0]["baseline_g1_ndcg"])
+        if runs[0].get("baseline_g2_ndcg") is not None:
+            stats["baseline_g2_ndcg"] = float(runs[0]["baseline_g2_ndcg"])
 
         return stats
 
@@ -454,10 +516,17 @@ class GAStatisticalEvaluator:
                 "n_runs": stats["n_runs"],
                 "success_rate": stats["success_rate"],
                 "original_ugf": stats["original_ugf"],
+                "original_ugf_ndcg": stats.get("original_ugf_ndcg"),
                 "epsilon": stats["epsilon"],
                 "baseline_f1": stats["baseline_f1"],
                 "baseline_ndcg": stats["baseline_ndcg"],
+                # Baseline group scores
+                "baseline_g1_f1": stats.get("baseline_g1_f1"),
+                "baseline_g2_f1": stats.get("baseline_g2_f1"),
+                "baseline_g1_ndcg": stats.get("baseline_g1_ndcg"),
+                "baseline_g2_ndcg": stats.get("baseline_g2_ndcg"),
             }
+
             # Add metric statistics
             for metric in [
                 "final_ugf",
@@ -465,6 +534,13 @@ class GAStatisticalEvaluator:
                 "final_ndcg",
                 "cpu_time",
                 "ugf_reduction_pct",
+                "final_ugf_ndcg",
+                "ugf_ndcg_reduction_pct",
+                # Group-level metrics
+                "final_g1_f1",
+                "final_g2_f1",
+                "final_g1_ndcg",
+                "final_g2_ndcg",
             ]:
                 if metric in stats:
                     for stat_name, stat_value in stats[metric].items():

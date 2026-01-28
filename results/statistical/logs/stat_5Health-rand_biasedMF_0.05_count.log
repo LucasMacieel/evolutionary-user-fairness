@@ -4,47 +4,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.58 seconds
-After optimization overall metric scores     : ndcg@10=0.3956 f1@10=0.1240
-After optimization group 1 (active) scores   : ndcg@10=0.5566 f1@10=0.2183
-After optimization group 2 (inactive) scores : ndcg@10=0.3801 f1@10=0.1147
-After optimization UGF: 0.0964
-UGF reduction: 0.1129 (54.0%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.55 seconds
-After optimization overall metric scores     : ndcg@10=0.3954 f1@10=0.1239
-After optimization group 1 (active) scores   : ndcg@10=0.5668 f1@10=0.2229
-After optimization group 2 (inactive) scores : ndcg@10=0.3793 f1@10=0.1143
-After optimization UGF: 0.1015
-UGF reduction: 0.1078 (51.5%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.48 seconds
-After optimization overall metric scores     : ndcg@10=0.3939 f1@10=0.1222
-After optimization group 1 (active) scores   : ndcg@10=0.5564 f1@10=0.2237
+CPU time: 9.97 seconds
+After optimization overall metric scores     : ndcg@10=0.3957 f1@10=0.1218
+After optimization group 1 (active) scores   : ndcg@10=0.5703 f1@10=0.2123
 After optimization group 2 (inactive) scores : ndcg@10=0.3793 f1@10=0.1133
-After optimization UGF: 0.0985
-UGF reduction: 0.1108 (53.0%)
+After optimization UGF (f1@10): 0.0990 (9.90%) | UGF (ndcg@10): 0.1910 (19.10%)
+UGF reduction: 0.1103 (52.7%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -52,15 +20,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.55 seconds
-After optimization overall metric scores     : ndcg@10=0.3957 f1@10=0.1232
-After optimization group 1 (active) scores   : ndcg@10=0.5767 f1@10=0.2272
-After optimization group 2 (inactive) scores : ndcg@10=0.3806 f1@10=0.1147
-After optimization UGF: 0.1043
-UGF reduction: 0.1050 (50.2%)
+CPU time: 9.65 seconds
+After optimization overall metric scores     : ndcg@10=0.3955 f1@10=0.1224
+After optimization group 1 (active) scores   : ndcg@10=0.5621 f1@10=0.2143
+After optimization group 2 (inactive) scores : ndcg@10=0.3799 f1@10=0.1138
+After optimization UGF (f1@10): 0.1006 (10.06%) | UGF (ndcg@10): 0.1821 (18.21%)
+UGF reduction: 0.1087 (51.9%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -68,14 +36,14 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.49 seconds
-After optimization overall metric scores     : ndcg@10=0.3962 f1@10=0.1243
-After optimization group 1 (active) scores   : ndcg@10=0.5601 f1@10=0.2266
-After optimization group 2 (inactive) scores : ndcg@10=0.3814 f1@10=0.1153
-After optimization UGF: 0.0975
+CPU time: 9.68 seconds
+After optimization overall metric scores     : ndcg@10=0.3969 f1@10=0.1230
+After optimization group 1 (active) scores   : ndcg@10=0.5626 f1@10=0.2122
+After optimization group 2 (inactive) scores : ndcg@10=0.3814 f1@10=0.1147
+After optimization UGF (f1@10): 0.0975 (9.75%) | UGF (ndcg@10): 0.1812 (18.12%)
 UGF reduction: 0.1118 (53.4%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
@@ -84,15 +52,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.51 seconds
-After optimization overall metric scores     : ndcg@10=0.3973 f1@10=0.1242
-After optimization group 1 (active) scores   : ndcg@10=0.5739 f1@10=0.2276
-After optimization group 2 (inactive) scores : ndcg@10=0.3810 f1@10=0.1148
-After optimization UGF: 0.0999
-UGF reduction: 0.1094 (52.3%)
+CPU time: 9.63 seconds
+After optimization overall metric scores     : ndcg@10=0.3957 f1@10=0.1219
+After optimization group 1 (active) scores   : ndcg@10=0.5655 f1@10=0.2138
+After optimization group 2 (inactive) scores : ndcg@10=0.3798 f1@10=0.1133
+After optimization UGF (f1@10): 0.1005 (10.05%) | UGF (ndcg@10): 0.1857 (18.57%)
+UGF reduction: 0.1088 (52.0%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -100,15 +68,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.49 seconds
-After optimization overall metric scores     : ndcg@10=0.3973 f1@10=0.1246
-After optimization group 1 (active) scores   : ndcg@10=0.5676 f1@10=0.2241
-After optimization group 2 (inactive) scores : ndcg@10=0.3815 f1@10=0.1152
-After optimization UGF: 0.0966
-UGF reduction: 0.1127 (53.9%)
+CPU time: 9.67 seconds
+After optimization overall metric scores     : ndcg@10=0.3955 f1@10=0.1214
+After optimization group 1 (active) scores   : ndcg@10=0.5691 f1@10=0.2084
+After optimization group 2 (inactive) scores : ndcg@10=0.3793 f1@10=0.1132
+After optimization UGF (f1@10): 0.0952 (9.52%) | UGF (ndcg@10): 0.1899 (18.99%)
+UGF reduction: 0.1141 (54.5%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -116,15 +84,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.50 seconds
-After optimization overall metric scores     : ndcg@10=0.3957 f1@10=0.1230
-After optimization group 1 (active) scores   : ndcg@10=0.5723 f1@10=0.2268
-After optimization group 2 (inactive) scores : ndcg@10=0.3792 f1@10=0.1137
-After optimization UGF: 0.1013
-UGF reduction: 0.1080 (51.6%)
+CPU time: 9.63 seconds
+After optimization overall metric scores     : ndcg@10=0.3952 f1@10=0.1218
+After optimization group 1 (active) scores   : ndcg@10=0.5645 f1@10=0.2117
+After optimization group 2 (inactive) scores : ndcg@10=0.3794 f1@10=0.1134
+After optimization UGF (f1@10): 0.0983 (9.83%) | UGF (ndcg@10): 0.1851 (18.51%)
+UGF reduction: 0.1110 (53.0%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -132,15 +100,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.53 seconds
-After optimization overall metric scores     : ndcg@10=0.3961 f1@10=0.1240
-After optimization group 1 (active) scores   : ndcg@10=0.5695 f1@10=0.2242
-After optimization group 2 (inactive) scores : ndcg@10=0.3799 f1@10=0.1145
-After optimization UGF: 0.0950
-UGF reduction: 0.1143 (54.6%)
+Early stop at generation 15: first feasible solution found
+CPU time: 9.39 seconds
+After optimization overall metric scores     : ndcg@10=0.3958 f1@10=0.1231
+After optimization group 1 (active) scores   : ndcg@10=0.5637 f1@10=0.2175
+After optimization group 2 (inactive) scores : ndcg@10=0.3801 f1@10=0.1142
+After optimization UGF (f1@10): 0.1033 (10.33%) | UGF (ndcg@10): 0.1836 (18.36%)
+UGF reduction: 0.1060 (50.6%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -148,15 +116,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.53 seconds
-After optimization overall metric scores     : ndcg@10=0.3975 f1@10=0.1242
-After optimization group 1 (active) scores   : ndcg@10=0.5717 f1@10=0.2243
-After optimization group 2 (inactive) scores : ndcg@10=0.3799 f1@10=0.1137
-After optimization UGF: 0.0977
-UGF reduction: 0.1116 (53.3%)
+CPU time: 9.65 seconds
+After optimization overall metric scores     : ndcg@10=0.3960 f1@10=0.1220
+After optimization group 1 (active) scores   : ndcg@10=0.5724 f1@10=0.2099
+After optimization group 2 (inactive) scores : ndcg@10=0.3795 f1@10=0.1138
+After optimization UGF (f1@10): 0.0961 (9.61%) | UGF (ndcg@10): 0.1929 (19.29%)
+UGF reduction: 0.1131 (54.1%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -164,15 +132,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.50 seconds
-After optimization overall metric scores     : ndcg@10=0.3944 f1@10=0.1227
-After optimization group 1 (active) scores   : ndcg@10=0.5593 f1@10=0.2239
-After optimization group 2 (inactive) scores : ndcg@10=0.3800 f1@10=0.1142
-After optimization UGF: 0.1021
-UGF reduction: 0.1071 (51.2%)
+CPU time: 9.92 seconds
+After optimization overall metric scores     : ndcg@10=0.3952 f1@10=0.1219
+After optimization group 1 (active) scores   : ndcg@10=0.5650 f1@10=0.2101
+After optimization group 2 (inactive) scores : ndcg@10=0.3794 f1@10=0.1136
+After optimization UGF (f1@10): 0.0965 (9.65%) | UGF (ndcg@10): 0.1856 (18.56%)
+UGF reduction: 0.1128 (53.9%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -180,15 +148,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.54 seconds
-After optimization overall metric scores     : ndcg@10=0.3950 f1@10=0.1227
-After optimization group 1 (active) scores   : ndcg@10=0.5778 f1@10=0.2266
-After optimization group 2 (inactive) scores : ndcg@10=0.3794 f1@10=0.1145
-After optimization UGF: 0.0998
-UGF reduction: 0.1094 (52.3%)
+CPU time: 9.77 seconds
+After optimization overall metric scores     : ndcg@10=0.3951 f1@10=0.1219
+After optimization group 1 (active) scores   : ndcg@10=0.5646 f1@10=0.2099
+After optimization group 2 (inactive) scores : ndcg@10=0.3793 f1@10=0.1137
+After optimization UGF (f1@10): 0.0963 (9.63%) | UGF (ndcg@10): 0.1853 (18.53%)
+UGF reduction: 0.1130 (54.0%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -196,15 +164,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.52 seconds
-After optimization overall metric scores     : ndcg@10=0.3966 f1@10=0.1238
-After optimization group 1 (active) scores   : ndcg@10=0.5644 f1@10=0.2233
-After optimization group 2 (inactive) scores : ndcg@10=0.3798 f1@10=0.1135
-After optimization UGF: 0.0946
-UGF reduction: 0.1146 (54.8%)
+CPU time: 9.97 seconds
+After optimization overall metric scores     : ndcg@10=0.3957 f1@10=0.1223
+After optimization group 1 (active) scores   : ndcg@10=0.5712 f1@10=0.2152
+After optimization group 2 (inactive) scores : ndcg@10=0.3793 f1@10=0.1136
+After optimization UGF (f1@10): 0.1016 (10.16%) | UGF (ndcg@10): 0.1919 (19.19%)
+UGF reduction: 0.1076 (51.4%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -212,15 +180,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.53 seconds
-After optimization overall metric scores     : ndcg@10=0.3966 f1@10=0.1245
-After optimization group 1 (active) scores   : ndcg@10=0.5624 f1@10=0.2290
-After optimization group 2 (inactive) scores : ndcg@10=0.3809 f1@10=0.1147
-After optimization UGF: 0.0991
-UGF reduction: 0.1102 (52.6%)
+CPU time: 9.61 seconds
+After optimization overall metric scores     : ndcg@10=0.3948 f1@10=0.1215
+After optimization group 1 (active) scores   : ndcg@10=0.5665 f1@10=0.2086
+After optimization group 2 (inactive) scores : ndcg@10=0.3787 f1@10=0.1134
+After optimization UGF (f1@10): 0.0952 (9.52%) | UGF (ndcg@10): 0.1877 (18.77%)
+UGF reduction: 0.1140 (54.5%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -228,14 +196,14 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.57 seconds
-After optimization overall metric scores     : ndcg@10=0.3946 f1@10=0.1226
-After optimization group 1 (active) scores   : ndcg@10=0.5563 f1@10=0.2227
-After optimization group 2 (inactive) scores : ndcg@10=0.3814 f1@10=0.1148
-After optimization UGF: 0.0967
+CPU time: 9.78 seconds
+After optimization overall metric scores     : ndcg@10=0.3949 f1@10=0.1218
+After optimization group 1 (active) scores   : ndcg@10=0.5590 f1@10=0.2103
+After optimization group 2 (inactive) scores : ndcg@10=0.3795 f1@10=0.1135
+After optimization UGF (f1@10): 0.0968 (9.68%) | UGF (ndcg@10): 0.1795 (17.95%)
 UGF reduction: 0.1125 (53.8%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
@@ -244,15 +212,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
-Early stop at generation 15: first feasible solution found
-CPU time: 8.95 seconds
-After optimization overall metric scores     : ndcg@10=0.3983 f1@10=0.1253
-After optimization group 1 (active) scores   : ndcg@10=0.5706 f1@10=0.2303
-After optimization group 2 (inactive) scores : ndcg@10=0.3823 f1@10=0.1154
-After optimization UGF: 0.1039
-UGF reduction: 0.1053 (50.3%)
+Early stop at generation 16: first feasible solution found
+CPU time: 9.83 seconds
+After optimization overall metric scores     : ndcg@10=0.3955 f1@10=0.1230
+After optimization group 1 (active) scores   : ndcg@10=0.5536 f1@10=0.2136
+After optimization group 2 (inactive) scores : ndcg@10=0.3808 f1@10=0.1146
+After optimization UGF (f1@10): 0.0991 (9.91%) | UGF (ndcg@10): 0.1728 (17.28%)
+UGF reduction: 0.1102 (52.7%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -260,15 +228,15 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 15: first feasible solution found
 CPU time: 9.03 seconds
-After optimization overall metric scores     : ndcg@10=0.3951 f1@10=0.1247
-After optimization group 1 (active) scores   : ndcg@10=0.5640 f1@10=0.2313
-After optimization group 2 (inactive) scores : ndcg@10=0.3797 f1@10=0.1151
-After optimization UGF: 0.1043
-UGF reduction: 0.1050 (50.2%)
+After optimization overall metric scores     : ndcg@10=0.3944 f1@10=0.1227
+After optimization group 1 (active) scores   : ndcg@10=0.5600 f1@10=0.2182
+After optimization group 2 (inactive) scores : ndcg@10=0.3789 f1@10=0.1138
+After optimization UGF (f1@10): 0.1044 (10.44%) | UGF (ndcg@10): 0.1811 (18.11%)
+UGF reduction: 0.1049 (50.1%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
 GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
@@ -276,190 +244,14 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.62 seconds
-After optimization overall metric scores     : ndcg@10=0.3960 f1@10=0.1245
-After optimization group 1 (active) scores   : ndcg@10=0.5694 f1@10=0.2242
-After optimization group 2 (inactive) scores : ndcg@10=0.3795 f1@10=0.1147
-After optimization UGF: 0.1012
-UGF reduction: 0.1081 (51.6%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.57 seconds
-After optimization overall metric scores     : ndcg@10=0.3975 f1@10=0.1246
-After optimization group 1 (active) scores   : ndcg@10=0.5753 f1@10=0.2267
-After optimization group 2 (inactive) scores : ndcg@10=0.3796 f1@10=0.1136
-After optimization UGF: 0.1039
-UGF reduction: 0.1054 (50.4%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.54 seconds
-After optimization overall metric scores     : ndcg@10=0.3961 f1@10=0.1242
-After optimization group 1 (active) scores   : ndcg@10=0.5578 f1@10=0.2233
-After optimization group 2 (inactive) scores : ndcg@10=0.3810 f1@10=0.1147
-After optimization UGF: 0.1012
-UGF reduction: 0.1081 (51.7%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
 CPU time: 9.55 seconds
-After optimization overall metric scores     : ndcg@10=0.3974 f1@10=0.1245
-After optimization group 1 (active) scores   : ndcg@10=0.5732 f1@10=0.2280
-After optimization group 2 (inactive) scores : ndcg@10=0.3810 f1@10=0.1148
-After optimization UGF: 0.1039
-UGF reduction: 0.1053 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.52 seconds
-After optimization overall metric scores     : ndcg@10=0.3959 f1@10=0.1241
-After optimization group 1 (active) scores   : ndcg@10=0.5707 f1@10=0.2300
-After optimization group 2 (inactive) scores : ndcg@10=0.3797 f1@10=0.1144
-After optimization UGF: 0.1040
-UGF reduction: 0.1052 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.50 seconds
-After optimization overall metric scores     : ndcg@10=0.3964 f1@10=0.1245
-After optimization group 1 (active) scores   : ndcg@10=0.5733 f1@10=0.2297
-After optimization group 2 (inactive) scores : ndcg@10=0.3795 f1@10=0.1147
-After optimization UGF: 0.1039
-UGF reduction: 0.1054 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.50 seconds
-After optimization overall metric scores     : ndcg@10=0.3959 f1@10=0.1237
-After optimization group 1 (active) scores   : ndcg@10=0.5671 f1@10=0.2258
-After optimization group 2 (inactive) scores : ndcg@10=0.3800 f1@10=0.1141
-After optimization UGF: 0.0974
-UGF reduction: 0.1118 (53.4%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.53 seconds
-After optimization overall metric scores     : ndcg@10=0.3946 f1@10=0.1221
-After optimization group 1 (active) scores   : ndcg@10=0.5642 f1@10=0.2205
-After optimization group 2 (inactive) scores : ndcg@10=0.3789 f1@10=0.1135
-After optimization UGF: 0.0938
-UGF reduction: 0.1155 (55.2%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.50 seconds
-After optimization overall metric scores     : ndcg@10=0.3940 f1@10=0.1233
-After optimization group 1 (active) scores   : ndcg@10=0.5666 f1@10=0.2240
-After optimization group 2 (inactive) scores : ndcg@10=0.3785 f1@10=0.1141
-After optimization UGF: 0.0991
-UGF reduction: 0.1102 (52.6%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 16: first feasible solution found
-CPU time: 9.51 seconds
-After optimization overall metric scores     : ndcg@10=0.3966 f1@10=0.1240
-After optimization group 1 (active) scores   : ndcg@10=0.5675 f1@10=0.2242
-After optimization group 2 (inactive) scores : ndcg@10=0.3811 f1@10=0.1148
-After optimization UGF: 0.0948
-UGF reduction: 0.1145 (54.7%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 15: first feasible solution found
-CPU time: 8.97 seconds
-After optimization overall metric scores     : ndcg@10=0.3954 f1@10=0.1248
-After optimization group 1 (active) scores   : ndcg@10=0.5633 f1@10=0.2256
-After optimization group 2 (inactive) scores : ndcg@10=0.3787 f1@10=0.1137
-After optimization UGF: 0.1045
-UGF reduction: 0.1048 (50.1%)
-Constraint satisfied: True
-GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
-Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
-Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
-Epsilon: 0.1046
-Early stop at generation 15: first feasible solution found
-CPU time: 9.05 seconds
-After optimization overall metric scores     : ndcg@10=0.3961 f1@10=0.1248
-After optimization group 1 (active) scores   : ndcg@10=0.5623 f1@10=0.2289
-After optimization group 2 (inactive) scores : ndcg@10=0.3805 f1@10=0.1151
-After optimization UGF: 0.1020
+After optimization overall metric scores     : ndcg@10=0.3951 f1@10=0.1222
+After optimization group 1 (active) scores   : ndcg@10=0.5597 f1@10=0.2155
+After optimization group 2 (inactive) scores : ndcg@10=0.3797 f1@10=0.1135
+After optimization UGF (f1@10): 0.1019 (10.19%) | UGF (ndcg@10): 0.1799 (17.99%)
 UGF reduction: 0.1073 (51.3%)
 Constraint satisfied: True
 GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
@@ -468,13 +260,221 @@ Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
 Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
-Before optimization UGF (f1@10): 0.2093
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 15: first feasible solution found
+CPU time: 9.35 seconds
+After optimization overall metric scores     : ndcg@10=0.3963 f1@10=0.1229
+After optimization group 1 (active) scores   : ndcg@10=0.5685 f1@10=0.2180
+After optimization group 2 (inactive) scores : ndcg@10=0.3802 f1@10=0.1140
+After optimization UGF (f1@10): 0.1040 (10.40%) | UGF (ndcg@10): 0.1883 (18.83%)
+UGF reduction: 0.1053 (50.3%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
 Epsilon: 0.1046
 Early stop at generation 16: first feasible solution found
-CPU time: 9.56 seconds
-After optimization overall metric scores     : ndcg@10=0.3977 f1@10=0.1247
-After optimization group 1 (active) scores   : ndcg@10=0.5696 f1@10=0.2251
-After optimization group 2 (inactive) scores : ndcg@10=0.3800 f1@10=0.1140
-After optimization UGF: 0.0979
-UGF reduction: 0.1113 (53.2%)
+CPU time: 9.83 seconds
+After optimization overall metric scores     : ndcg@10=0.3956 f1@10=0.1227
+After optimization group 1 (active) scores   : ndcg@10=0.5689 f1@10=0.2155
+After optimization group 2 (inactive) scores : ndcg@10=0.3794 f1@10=0.1140
+After optimization UGF (f1@10): 0.1015 (10.15%) | UGF (ndcg@10): 0.1895 (18.95%)
+UGF reduction: 0.1078 (51.5%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.75 seconds
+After optimization overall metric scores     : ndcg@10=0.3964 f1@10=0.1221
+After optimization group 1 (active) scores   : ndcg@10=0.5664 f1@10=0.2106
+After optimization group 2 (inactive) scores : ndcg@10=0.3805 f1@10=0.1139
+After optimization UGF (f1@10): 0.0967 (9.67%) | UGF (ndcg@10): 0.1859 (18.59%)
+UGF reduction: 0.1126 (53.8%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 15: first feasible solution found
+CPU time: 9.24 seconds
+After optimization overall metric scores     : ndcg@10=0.3970 f1@10=0.1230
+After optimization group 1 (active) scores   : ndcg@10=0.5742 f1@10=0.2183
+After optimization group 2 (inactive) scores : ndcg@10=0.3805 f1@10=0.1141
+After optimization UGF (f1@10): 0.1042 (10.42%) | UGF (ndcg@10): 0.1937 (19.37%)
+UGF reduction: 0.1051 (50.2%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.80 seconds
+After optimization overall metric scores     : ndcg@10=0.3960 f1@10=0.1219
+After optimization group 1 (active) scores   : ndcg@10=0.5673 f1@10=0.2112
+After optimization group 2 (inactive) scores : ndcg@10=0.3800 f1@10=0.1136
+After optimization UGF (f1@10): 0.0976 (9.76%) | UGF (ndcg@10): 0.1873 (18.73%)
+UGF reduction: 0.1117 (53.4%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.88 seconds
+After optimization overall metric scores     : ndcg@10=0.3952 f1@10=0.1222
+After optimization group 1 (active) scores   : ndcg@10=0.5667 f1@10=0.2152
+After optimization group 2 (inactive) scores : ndcg@10=0.3792 f1@10=0.1135
+After optimization UGF (f1@10): 0.1017 (10.17%) | UGF (ndcg@10): 0.1875 (18.75%)
+UGF reduction: 0.1076 (51.4%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.48 seconds
+After optimization overall metric scores     : ndcg@10=0.3958 f1@10=0.1225
+After optimization group 1 (active) scores   : ndcg@10=0.5688 f1@10=0.2160
+After optimization group 2 (inactive) scores : ndcg@10=0.3796 f1@10=0.1137
+After optimization UGF (f1@10): 0.1023 (10.23%) | UGF (ndcg@10): 0.1893 (18.93%)
+UGF reduction: 0.1070 (51.1%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.35 seconds
+After optimization overall metric scores     : ndcg@10=0.3951 f1@10=0.1226
+After optimization group 1 (active) scores   : ndcg@10=0.5684 f1@10=0.2173
+After optimization group 2 (inactive) scores : ndcg@10=0.3789 f1@10=0.1137
+After optimization UGF (f1@10): 0.1036 (10.36%) | UGF (ndcg@10): 0.1895 (18.95%)
+UGF reduction: 0.1056 (50.5%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 15: first feasible solution found
+CPU time: 8.92 seconds
+After optimization overall metric scores     : ndcg@10=0.3956 f1@10=0.1232
+After optimization group 1 (active) scores   : ndcg@10=0.5685 f1@10=0.2168
+After optimization group 2 (inactive) scores : ndcg@10=0.3795 f1@10=0.1144
+After optimization UGF (f1@10): 0.1024 (10.24%) | UGF (ndcg@10): 0.1891 (18.91%)
+UGF reduction: 0.1068 (51.1%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.43 seconds
+After optimization overall metric scores     : ndcg@10=0.3935 f1@10=0.1216
+After optimization group 1 (active) scores   : ndcg@10=0.5583 f1@10=0.2134
+After optimization group 2 (inactive) scores : ndcg@10=0.3781 f1@10=0.1130
+After optimization UGF (f1@10): 0.1005 (10.05%) | UGF (ndcg@10): 0.1802 (18.02%)
+UGF reduction: 0.1088 (52.0%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.58 seconds
+After optimization overall metric scores     : ndcg@10=0.3941 f1@10=0.1216
+After optimization group 1 (active) scores   : ndcg@10=0.5622 f1@10=0.2100
+After optimization group 2 (inactive) scores : ndcg@10=0.3784 f1@10=0.1133
+After optimization UGF (f1@10): 0.0966 (9.66%) | UGF (ndcg@10): 0.1838 (18.38%)
+UGF reduction: 0.1126 (53.8%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 10.24 seconds
+After optimization overall metric scores     : ndcg@10=0.3945 f1@10=0.1219
+After optimization group 1 (active) scores   : ndcg@10=0.5612 f1@10=0.2104
+After optimization group 2 (inactive) scores : ndcg@10=0.3789 f1@10=0.1136
+After optimization UGF (f1@10): 0.0967 (9.67%) | UGF (ndcg@10): 0.1823 (18.23%)
+UGF reduction: 0.1125 (53.8%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.63 seconds
+After optimization overall metric scores     : ndcg@10=0.3946 f1@10=0.1217
+After optimization group 1 (active) scores   : ndcg@10=0.5596 f1@10=0.2097
+After optimization group 2 (inactive) scores : ndcg@10=0.3791 f1@10=0.1135
+After optimization UGF (f1@10): 0.0962 (9.62%) | UGF (ndcg@10): 0.1805 (18.05%)
+UGF reduction: 0.1131 (54.0%)
+Constraint satisfied: True
+GA Optimizer | Model:biasedMF | Dataset:dataset\5Health-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
+Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
+Before optimization group 1 (active) scores  : ndcg@10=0.6655 f1@10=0.3306
+Before optimization group 2 (inactive) scores: ndcg@10=0.3901 f1@10=0.1213
+Before optimization UGF (f1@10): 0.2093 (20.93%) | UGF (ndcg@10): 0.2754 (27.54%)
+Epsilon: 0.1046
+Early stop at generation 16: first feasible solution found
+CPU time: 9.51 seconds
+After optimization overall metric scores     : ndcg@10=0.3946 f1@10=0.1220
+After optimization group 1 (active) scores   : ndcg@10=0.5593 f1@10=0.2083
+After optimization group 2 (inactive) scores : ndcg@10=0.3792 f1@10=0.1140
+After optimization UGF (f1@10): 0.0943 (9.43%) | UGF (ndcg@10): 0.1801 (18.01%)
+UGF reduction: 0.1149 (54.9%)
 Constraint satisfied: True

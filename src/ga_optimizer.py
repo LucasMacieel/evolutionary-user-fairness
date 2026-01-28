@@ -658,15 +658,28 @@ class GAOptimizer:
             f"Before optimization group 2 (inactive) scores: {self._format_metrics(baseline_eval['g2'])}"
         )
 
-        # Calculate original UGF
+        # Calculate original UGF for fairness metric (f1)
         baseline_pop = baseline_solution[np.newaxis, :, :]
         _, _, ugf_gaps, _ = self._calculate_fitness_batch(
             baseline_pop, current_epsilon=1.0
         )
         self.original_ugf = ugf_gaps[0]
-        self.logger.info(
-            f"Before optimization UGF ({self.fairness_metric}@{self.k}): {self.original_ugf:.4f}"
-        )
+
+        # Calculate UGF for NDCG as well (for logging parity with MILP solvers)
+        ndcg_metric_key = f"ndcg@{self.k}"
+        f1_metric_key = f"{self.fairness_metric}@{self.k}"
+        if ndcg_metric_key in self.eval_metric_list:
+            ndcg_idx = self.eval_metric_list.index(ndcg_metric_key)
+            g1_ndcg = baseline_eval["g1"][ndcg_idx]
+            g2_ndcg = baseline_eval["g2"][ndcg_idx]
+            original_ugf_ndcg = abs(g1_ndcg - g2_ndcg)
+            self.logger.info(
+                f"Before optimization UGF ({f1_metric_key}): {self.original_ugf:.4f} ({self.original_ugf * 100:.2f}%) | UGF ({ndcg_metric_key}): {original_ugf_ndcg:.4f} ({original_ugf_ndcg * 100:.2f}%)"
+            )
+        else:
+            self.logger.info(
+                f"Before optimization UGF ({f1_metric_key}): {self.original_ugf:.4f} ({self.original_ugf * 100:.2f}%)"
+            )
 
         # Calculate epsilon dynamically as UGF/2
         self.epsilon = self.original_ugf / 2
@@ -717,7 +730,20 @@ class GAOptimizer:
         g2_fairness_score = final_eval["g2"][metric_idx]
         final_ugf = abs(g1_fairness_score - g2_fairness_score)
 
-        self.logger.info(f"After optimization UGF: {final_ugf:.4f}")
+        # Calculate UGF for NDCG as well (for logging parity with MILP solvers)
+        ndcg_metric_key = f"ndcg@{self.k}"
+        if ndcg_metric_key in self.eval_metric_list:
+            ndcg_idx = self.eval_metric_list.index(ndcg_metric_key)
+            g1_ndcg = final_eval["g1"][ndcg_idx]
+            g2_ndcg = final_eval["g2"][ndcg_idx]
+            final_ugf_ndcg = abs(g1_ndcg - g2_ndcg)
+            self.logger.info(
+                f"After optimization UGF ({fairness_metric_key}): {final_ugf:.4f} ({final_ugf * 100:.2f}%) | UGF ({ndcg_metric_key}): {final_ugf_ndcg:.4f} ({final_ugf_ndcg * 100:.2f}%)"
+            )
+        else:
+            self.logger.info(
+                f"After optimization UGF ({fairness_metric_key}): {final_ugf:.4f} ({final_ugf * 100:.2f}%)"
+            )
 
         # UGF improvement
         ugf_reduction = self.original_ugf - final_ugf
@@ -738,15 +764,63 @@ class GAOptimizer:
             f"Result: UGF {self.original_ugf:.4f} -> {final_ugf:.4f} ({ugf_reduction_pct:.1f}% reduction) [{status}]"
         )
 
+        # Calculate NDCG UGF values for return dict
+        ndcg_metric_key = f"ndcg@{self.k}"
+        original_ugf_ndcg = None
+        final_ugf_ndcg = None
+        if ndcg_metric_key in self.eval_metric_list:
+            ndcg_idx = self.eval_metric_list.index(ndcg_metric_key)
+            # Final NDCG UGF
+            g1_ndcg_final = final_eval["g1"][ndcg_idx]
+            g2_ndcg_final = final_eval["g2"][ndcg_idx]
+            final_ugf_ndcg = abs(g1_ndcg_final - g2_ndcg_final)
+            # Original NDCG UGF (from baseline)
+            g1_ndcg_orig = baseline_eval["g1"][ndcg_idx]
+            g2_ndcg_orig = baseline_eval["g2"][ndcg_idx]
+            original_ugf_ndcg = abs(g1_ndcg_orig - g2_ndcg_orig)
+
+        # Extract group scores for f1 and ndcg metrics
+        f1_metric_key = f"{self.fairness_metric}@{self.k}"
+        f1_idx = self.eval_metric_list.index(f1_metric_key)
+
+        # Group scores for f1
+        final_g1_f1 = final_eval["g1"][f1_idx]
+        final_g2_f1 = final_eval["g2"][f1_idx]
+        baseline_g1_f1 = baseline_eval["g1"][f1_idx]
+        baseline_g2_f1 = baseline_eval["g2"][f1_idx]
+
+        # Group scores for ndcg (if available)
+        final_g1_ndcg = None
+        final_g2_ndcg = None
+        baseline_g1_ndcg = None
+        baseline_g2_ndcg = None
+        if ndcg_metric_key in self.eval_metric_list:
+            final_g1_ndcg = g1_ndcg_final
+            final_g2_ndcg = g2_ndcg_final
+            baseline_g1_ndcg = g1_ndcg_orig
+            baseline_g2_ndcg = g2_ndcg_orig
+
         return {
             "baseline_metrics": baseline_eval["overall"],
             "final_metrics": final_eval["overall"],
             "original_ugf": self.original_ugf,
             "final_ugf": final_ugf,
+            "original_ugf_ndcg": original_ugf_ndcg,
+            "final_ugf_ndcg": final_ugf_ndcg,
             "epsilon": self.epsilon,
             "constraint_satisfied": constraint_satisfied,
             "cpu_time": cpu_time,
             "best_fitness": best_fitness,
+            # Group 1 (active) scores
+            "final_g1_f1": final_g1_f1,
+            "final_g1_ndcg": final_g1_ndcg,
+            "baseline_g1_f1": baseline_g1_f1,
+            "baseline_g1_ndcg": baseline_g1_ndcg,
+            # Group 2 (inactive) scores
+            "final_g2_f1": final_g2_f1,
+            "final_g2_ndcg": final_g2_ndcg,
+            "baseline_g2_f1": baseline_g2_f1,
+            "baseline_g2_ndcg": baseline_g2_ndcg,
         }
 
     def train(self) -> Dict:
