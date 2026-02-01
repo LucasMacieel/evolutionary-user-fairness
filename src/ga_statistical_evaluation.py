@@ -52,13 +52,13 @@ class GAStatisticalEvaluator:
         # GA parameters (matching latest ga_optimizer.py defaults)
         population_size: int = 10,
         generations: int = 1000,
-        mutation_rate: float = 0.3145,
-        crossover_rate: float = 0.5857,
-        elitism_count: int = 7,
+        mutation_rate: float = 0.3504,
+        crossover_rate: float = 0.7262,
+        elitism_count: int = 5,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
-        penalty_beta1: float = 2.25,
-        penalty_beta2: float = 2.31,
-        penalty_history_k: int = 8,
+        penalty_beta1: float = 2.43,
+        penalty_beta2: float = 1.88,
+        penalty_history_k: int = 6,
     ):
         """
         Initialize the statistical evaluator.

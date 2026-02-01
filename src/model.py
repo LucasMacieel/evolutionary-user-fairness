@@ -258,7 +258,6 @@ class UGF(object):
         )
 
         # Calculate epsilon dynamically if set to 'auto' (paper methodology)
-        # Calculate epsilon dynamically if set to 'auto' (paper methodology)
         if self._epsilon_input == "auto":
             self.epsilon = original_ugf / 2  # Half of original UGF gap
             print("\nDynamic epsilon calculation (paper methodology):")

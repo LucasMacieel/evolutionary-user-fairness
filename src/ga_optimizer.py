@@ -40,14 +40,14 @@ class GAOptimizer:
         # GA parameters (optimized via Optuna hyperparameter tuning)
         population_size: int = 10,
         generations: int = 1000,
-        mutation_rate: float = 0.3145,
-        crossover_rate: float = 0.5857,
-        elitism_count: int = 7,
+        mutation_rate: float = 0.3504,
+        crossover_rate: float = 0.7262,
+        elitism_count: int = 5,
         seed: int = None,
         # Adaptive penalty parameters (Bean & Hadj-Alouane method)
-        penalty_beta1: float = 2.25,  # Tightening factor when all feasible
-        penalty_beta2: float = 2.31,  # Relaxation factor when all infeasible
-        penalty_history_k: int = 8,  # Lookback window for feasibility history
+        penalty_beta1: float = 2.43,  # Tightening factor when all feasible
+        penalty_beta2: float = 1.88,  # Relaxation factor when all infeasible
+        penalty_history_k: int = 6,  # Lookback window for feasibility history
         # Pre-built data for faster initialization (use build_vectorized_data())
         prebuilt_data: Dict = None,
     ):
@@ -248,7 +248,7 @@ class GAOptimizer:
         for u in range(self.n_users):
             self.valid_items_mask[u, : self.items_per_user_arr[u]] = True
 
-    def _calculate_fitness_batch(
+    def _calculate_fitness(
         self, population: np.ndarray, current_epsilon: float
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -318,40 +318,16 @@ class GAOptimizer:
 
     def _create_initial_population(self, size: int) -> np.ndarray:
         """
-        Create initial population as 'Perturbed Greedy'.
-        Instead of starting from zero quality (random), we start near the
-        greedy baseline (high quality) and explore the neighborhood.
+        Create initial population using warm start heuristic.
+        All individuals start as greedy baseline (top-K by score per user).
         """
         population = np.zeros((size, self.n_users, self.n_items), dtype=np.int8)
 
-        # Start with greedy selection for everyone
+        # Start with greedy selection for all individuals
         greedy_base = self._create_greedy_individual()
 
-        # Apply random perturbations (simulated annealing style start)
-        # We use the mutation logic to perturb
         for i in range(size):
             population[i] = greedy_base.copy()
-
-        # Perturb the population (except the first one which stays pure greedy)
-        # We apply mutations to diversify the population
-        # Use a slightly higher rate for initialization diversity
-        mutate_mask = np.random.random((size, self.n_users)) < self.mutation_rate
-
-        for i in range(1, size):  # Skip index 0 to keep one pure greedy
-            for u in range(self.n_users):
-                if mutate_mask[i, u]:
-                    n_valid = self.items_per_user_arr[u]
-                    # Only consider valid items (not padding)
-                    user_slice = population[i, u, :n_valid]
-                    selected = np.where(user_slice == 1)[0]
-                    unselected = np.where(user_slice == 0)[0]
-
-                    if len(selected) > 0 and len(unselected) > 0:
-                        # Random swap for initialization (unbiased exploration)
-                        to_remove = np.random.choice(selected)
-                        to_add = np.random.choice(unselected)
-                        population[i, u, to_remove] = 0
-                        population[i, u, to_add] = 1
 
         return population
 
@@ -369,7 +345,7 @@ class GAOptimizer:
 
         return individual
 
-    def _two_parent_crossover(
+    def _uniform_crossover(
         self,
         population: np.ndarray,
         objectives: np.ndarray,
@@ -377,7 +353,7 @@ class GAOptimizer:
         n_offspring: int,
     ) -> np.ndarray:
         """
-        Two-parent uniform crossover.
+        Uniform crossover.
 
         For each offspring, select 2 parents from the population via tournament selection.
         For each user position, randomly pick from one of the two parents.
@@ -408,7 +384,7 @@ class GAOptimizer:
 
         return offspring
 
-    def _mutate_batch(
+    def _swap_mutation_repair_bias(
         self, population: np.ndarray, bias_dir: float = 0.0, current_rate: float = None
     ) -> np.ndarray:
         """
@@ -660,7 +636,7 @@ class GAOptimizer:
 
         # Calculate original UGF for fairness metric (f1)
         baseline_pop = baseline_solution[np.newaxis, :, :]
-        _, _, ugf_gaps, _ = self._calculate_fitness_batch(
+        _, _, ugf_gaps, _ = self._calculate_fitness(
             baseline_pop, current_epsilon=1.0
         )
         self.original_ugf = ugf_gaps[0]
@@ -847,7 +823,7 @@ class GAOptimizer:
         # Initial evaluation
         start_epsilon = self.original_ugf
         target_epsilon = self.epsilon
-        objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness_batch(
+        objectives, violations, ugf_gaps, signed_ugf = self._calculate_fitness(
             population, start_epsilon
         )
 
@@ -895,9 +871,9 @@ class GAOptimizer:
             elite_indices = sorted_indices[: self.elitism_count]
             elites = population[elite_indices].copy()
 
-            # Two-parent uniform crossover
+            # Uniform crossover
             n_offspring = self.population_size - self.elitism_count
-            offspring = self._two_parent_crossover(
+            offspring = self._uniform_crossover(
                 population, objectives, violations, n_offspring
             )
 
@@ -908,7 +884,7 @@ class GAOptimizer:
             avg_bias = np.mean(signed_ugf)
 
             # Apply mutation with fixed rate
-            offspring = self._mutate_batch(
+            offspring = self._swap_mutation_repair_bias(
                 offspring, bias_dir=avg_bias, current_rate=self.mutation_rate
             )
 
@@ -917,7 +893,7 @@ class GAOptimizer:
 
             # Evaluate
             objectives, violations, ugf_gaps, signed_ugf = (
-                self._calculate_fitness_batch(population, current_epsilon)
+                self._calculate_fitness(population, current_epsilon)
             )
 
             # Track best

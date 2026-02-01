@@ -1,480 +1,480 @@
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.88 seconds
-After optimization overall metric scores     : ndcg@10=0.3771 f1@10=0.1273
-After optimization group 1 (active) scores   : ndcg@10=0.6068 f1@10=0.2300
-After optimization group 2 (inactive) scores : ndcg@10=0.3559 f1@10=0.1177
-After optimization UGF (f1@10): 0.1123 (11.23%) | UGF (ndcg@10): 0.2509 (25.09%)
-UGF reduction: 0.1227 (52.2%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.93 seconds
+After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1278
+After optimization group 1 (active) scores   : ndcg@10=0.6147 f1@10=0.2349
+After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1178
+After optimization UGF (f1@10): 0.1171 (11.71%) | UGF (ndcg@10): 0.2592 (25.92%)
+UGF reduction: 0.1180 (50.2%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.83 seconds
-After optimization overall metric scores     : ndcg@10=0.3778 f1@10=0.1290
-After optimization group 1 (active) scores   : ndcg@10=0.5995 f1@10=0.2363
-After optimization group 2 (inactive) scores : ndcg@10=0.3572 f1@10=0.1190
-After optimization UGF (f1@10): 0.1173 (11.73%) | UGF (ndcg@10): 0.2423 (24.23%)
-UGF reduction: 0.1178 (50.1%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.94 seconds
+After optimization overall metric scores     : ndcg@10=0.3757 f1@10=0.1281
+After optimization group 1 (active) scores   : ndcg@10=0.5981 f1@10=0.2342
+After optimization group 2 (inactive) scores : ndcg@10=0.3550 f1@10=0.1183
+After optimization UGF (f1@10): 0.1158 (11.58%) | UGF (ndcg@10): 0.2430 (24.30%)
+UGF reduction: 0.1192 (50.7%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 17: first feasible solution found
-CPU time: 4.08 seconds
-After optimization overall metric scores     : ndcg@10=0.3782 f1@10=0.1290
-After optimization group 1 (active) scores   : ndcg@10=0.6070 f1@10=0.2363
+Early stop at generation 13: first feasible solution found
+CPU time: 4.94 seconds
+After optimization overall metric scores     : ndcg@10=0.3756 f1@10=0.1276
+After optimization group 1 (active) scores   : ndcg@10=0.5895 f1@10=0.2294
+After optimization group 2 (inactive) scores : ndcg@10=0.3558 f1@10=0.1181
+After optimization UGF (f1@10): 0.1113 (11.13%) | UGF (ndcg@10): 0.2337 (23.37%)
+UGF reduction: 0.1238 (52.7%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 20: first feasible solution found
+CPU time: 7.51 seconds
+After optimization overall metric scores     : ndcg@10=0.3741 f1@10=0.1266
+After optimization group 1 (active) scores   : ndcg@10=0.5916 f1@10=0.2267
+After optimization group 2 (inactive) scores : ndcg@10=0.3539 f1@10=0.1173
+After optimization UGF (f1@10): 0.1094 (10.94%) | UGF (ndcg@10): 0.2377 (23.77%)
+UGF reduction: 0.1256 (53.4%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.96 seconds
+After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1290
+After optimization group 1 (active) scores   : ndcg@10=0.5995 f1@10=0.2354
 After optimization group 2 (inactive) scores : ndcg@10=0.3569 f1@10=0.1191
-After optimization UGF (f1@10): 0.1172 (11.72%) | UGF (ndcg@10): 0.2501 (25.01%)
-UGF reduction: 0.1178 (50.1%)
+After optimization UGF (f1@10): 0.1164 (11.64%) | UGF (ndcg@10): 0.2427 (24.27%)
+UGF reduction: 0.1187 (50.5%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 17: first feasible solution found
-CPU time: 4.05 seconds
-After optimization overall metric scores     : ndcg@10=0.3769 f1@10=0.1278
-After optimization group 1 (active) scores   : ndcg@10=0.6026 f1@10=0.2282
-After optimization group 2 (inactive) scores : ndcg@10=0.3560 f1@10=0.1185
-After optimization UGF (f1@10): 0.1096 (10.96%) | UGF (ndcg@10): 0.2466 (24.66%)
-UGF reduction: 0.1254 (53.4%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.84 seconds
-After optimization overall metric scores     : ndcg@10=0.3747 f1@10=0.1274
-After optimization group 1 (active) scores   : ndcg@10=0.5856 f1@10=0.2344
-After optimization group 2 (inactive) scores : ndcg@10=0.3551 f1@10=0.1175
-After optimization UGF (f1@10): 0.1169 (11.69%) | UGF (ndcg@10): 0.2305 (23.05%)
-UGF reduction: 0.1182 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.79 seconds
-After optimization overall metric scores     : ndcg@10=0.3774 f1@10=0.1276
-After optimization group 1 (active) scores   : ndcg@10=0.6138 f1@10=0.2349
-After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1176
-After optimization UGF (f1@10): 0.1173 (11.73%) | UGF (ndcg@10): 0.2583 (25.83%)
-UGF reduction: 0.1178 (50.1%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.83 seconds
-After optimization overall metric scores     : ndcg@10=0.3759 f1@10=0.1275
-After optimization group 1 (active) scores   : ndcg@10=0.5965 f1@10=0.2316
-After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1179
-After optimization UGF (f1@10): 0.1137 (11.37%) | UGF (ndcg@10): 0.2411 (24.11%)
-UGF reduction: 0.1213 (51.6%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 17: first feasible solution found
-CPU time: 4.05 seconds
-After optimization overall metric scores     : ndcg@10=0.3753 f1@10=0.1272
-After optimization group 1 (active) scores   : ndcg@10=0.5882 f1@10=0.2299
-After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1177
-After optimization UGF (f1@10): 0.1123 (11.23%) | UGF (ndcg@10): 0.2327 (23.27%)
-UGF reduction: 0.1228 (52.2%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.63 seconds
-After optimization overall metric scores     : ndcg@10=0.3768 f1@10=0.1289
-After optimization group 1 (active) scores   : ndcg@10=0.5938 f1@10=0.2358
-After optimization group 2 (inactive) scores : ndcg@10=0.3567 f1@10=0.1190
-After optimization UGF (f1@10): 0.1168 (11.68%) | UGF (ndcg@10): 0.2371 (23.71%)
-UGF reduction: 0.1183 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.85 seconds
-After optimization overall metric scores     : ndcg@10=0.3764 f1@10=0.1282
-After optimization group 1 (active) scores   : ndcg@10=0.5946 f1@10=0.2336
-After optimization group 2 (inactive) scores : ndcg@10=0.3562 f1@10=0.1184
-After optimization UGF (f1@10): 0.1152 (11.52%) | UGF (ndcg@10): 0.2384 (23.84%)
-UGF reduction: 0.1199 (51.0%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.62 seconds
-After optimization overall metric scores     : ndcg@10=0.3770 f1@10=0.1295
-After optimization group 1 (active) scores   : ndcg@10=0.5903 f1@10=0.2341
-After optimization group 2 (inactive) scores : ndcg@10=0.3572 f1@10=0.1198
-After optimization UGF (f1@10): 0.1143 (11.43%) | UGF (ndcg@10): 0.2331 (23.31%)
-UGF reduction: 0.1207 (51.4%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.83 seconds
-After optimization overall metric scores     : ndcg@10=0.3747 f1@10=0.1270
-After optimization group 1 (active) scores   : ndcg@10=0.5826 f1@10=0.2271
-After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1177
-After optimization UGF (f1@10): 0.1093 (10.93%) | UGF (ndcg@10): 0.2271 (22.71%)
-UGF reduction: 0.1257 (53.5%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.62 seconds
-After optimization overall metric scores     : ndcg@10=0.3762 f1@10=0.1286
-After optimization group 1 (active) scores   : ndcg@10=0.5896 f1@10=0.2360
-After optimization group 2 (inactive) scores : ndcg@10=0.3564 f1@10=0.1186
-After optimization UGF (f1@10): 0.1173 (11.73%) | UGF (ndcg@10): 0.2332 (23.32%)
-UGF reduction: 0.1177 (50.1%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.84 seconds
-After optimization overall metric scores     : ndcg@10=0.3759 f1@10=0.1282
-After optimization group 1 (active) scores   : ndcg@10=0.5829 f1@10=0.2302
-After optimization group 2 (inactive) scores : ndcg@10=0.3567 f1@10=0.1188
-After optimization UGF (f1@10): 0.1115 (11.15%) | UGF (ndcg@10): 0.2261 (22.61%)
-UGF reduction: 0.1236 (52.6%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.81 seconds
-After optimization overall metric scores     : ndcg@10=0.3781 f1@10=0.1279
-After optimization group 1 (active) scores   : ndcg@10=0.5932 f1@10=0.2254
-After optimization group 2 (inactive) scores : ndcg@10=0.3581 f1@10=0.1189
-After optimization UGF (f1@10): 0.1065 (10.65%) | UGF (ndcg@10): 0.2351 (23.51%)
-UGF reduction: 0.1285 (54.7%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.60 seconds
-After optimization overall metric scores     : ndcg@10=0.3757 f1@10=0.1277
-After optimization group 1 (active) scores   : ndcg@10=0.5883 f1@10=0.2301
-After optimization group 2 (inactive) scores : ndcg@10=0.3560 f1@10=0.1182
-After optimization UGF (f1@10): 0.1120 (11.20%) | UGF (ndcg@10): 0.2323 (23.23%)
-UGF reduction: 0.1231 (52.4%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.84 seconds
-After optimization overall metric scores     : ndcg@10=0.3766 f1@10=0.1283
-After optimization group 1 (active) scores   : ndcg@10=0.5870 f1@10=0.2293
-After optimization group 2 (inactive) scores : ndcg@10=0.3571 f1@10=0.1190
-After optimization UGF (f1@10): 0.1103 (11.03%) | UGF (ndcg@10): 0.2298 (22.98%)
-UGF reduction: 0.1248 (53.1%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.65 seconds
-After optimization overall metric scores     : ndcg@10=0.3774 f1@10=0.1292
-After optimization group 1 (active) scores   : ndcg@10=0.5917 f1@10=0.2367
-After optimization group 2 (inactive) scores : ndcg@10=0.3575 f1@10=0.1192
-After optimization UGF (f1@10): 0.1175 (11.75%) | UGF (ndcg@10): 0.2342 (23.42%)
-UGF reduction: 0.1176 (50.0%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.85 seconds
-After optimization overall metric scores     : ndcg@10=0.3777 f1@10=0.1277
-After optimization group 1 (active) scores   : ndcg@10=0.6011 f1@10=0.2278
-After optimization group 2 (inactive) scores : ndcg@10=0.3570 f1@10=0.1185
-After optimization UGF (f1@10): 0.1093 (10.93%) | UGF (ndcg@10): 0.2440 (24.40%)
-UGF reduction: 0.1257 (53.5%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.83 seconds
-After optimization overall metric scores     : ndcg@10=0.3761 f1@10=0.1271
-After optimization group 1 (active) scores   : ndcg@10=0.6038 f1@10=0.2318
-After optimization group 2 (inactive) scores : ndcg@10=0.3550 f1@10=0.1173
-After optimization UGF (f1@10): 0.1145 (11.45%) | UGF (ndcg@10): 0.2488 (24.88%)
-UGF reduction: 0.1206 (51.3%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.82 seconds
-After optimization overall metric scores     : ndcg@10=0.3755 f1@10=0.1291
-After optimization group 1 (active) scores   : ndcg@10=0.5787 f1@10=0.2359
-After optimization group 2 (inactive) scores : ndcg@10=0.3566 f1@10=0.1192
-After optimization UGF (f1@10): 0.1167 (11.67%) | UGF (ndcg@10): 0.2221 (22.21%)
-UGF reduction: 0.1183 (50.3%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 17: first feasible solution found
-CPU time: 4.05 seconds
-After optimization overall metric scores     : ndcg@10=0.3742 f1@10=0.1267
-After optimization group 1 (active) scores   : ndcg@10=0.5832 f1@10=0.2261
-After optimization group 2 (inactive) scores : ndcg@10=0.3549 f1@10=0.1175
-After optimization UGF (f1@10): 0.1086 (10.86%) | UGF (ndcg@10): 0.2283 (22.83%)
-UGF reduction: 0.1265 (53.8%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.60 seconds
-After optimization overall metric scores     : ndcg@10=0.3762 f1@10=0.1285
-After optimization group 1 (active) scores   : ndcg@10=0.5990 f1@10=0.2361
-After optimization group 2 (inactive) scores : ndcg@10=0.3555 f1@10=0.1186
-After optimization UGF (f1@10): 0.1175 (11.75%) | UGF (ndcg@10): 0.2435 (24.35%)
-UGF reduction: 0.1175 (50.0%)
-Constraint satisfied: True
-GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
-Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
-Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
-Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
-Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
-Epsilon: 0.1175
-Early stop at generation 15: first feasible solution found
-CPU time: 3.61 seconds
-After optimization overall metric scores     : ndcg@10=0.3764 f1@10=0.1288
-After optimization group 1 (active) scores   : ndcg@10=0.5940 f1@10=0.2359
-After optimization group 2 (inactive) scores : ndcg@10=0.3562 f1@10=0.1189
-After optimization UGF (f1@10): 0.1170 (11.70%) | UGF (ndcg@10): 0.2378 (23.78%)
+Early stop at generation 18: first feasible solution found
+CPU time: 6.73 seconds
+After optimization overall metric scores     : ndcg@10=0.3766 f1@10=0.1280
+After optimization group 1 (active) scores   : ndcg@10=0.6002 f1@10=0.2350
+After optimization group 2 (inactive) scores : ndcg@10=0.3558 f1@10=0.1180
+After optimization UGF (f1@10): 0.1170 (11.70%) | UGF (ndcg@10): 0.2443 (24.43%)
 UGF reduction: 0.1181 (50.2%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.85 seconds
-After optimization overall metric scores     : ndcg@10=0.3765 f1@10=0.1269
-After optimization group 1 (active) scores   : ndcg@10=0.6098 f1@10=0.2324
-After optimization group 2 (inactive) scores : ndcg@10=0.3549 f1@10=0.1171
-After optimization UGF (f1@10): 0.1154 (11.54%) | UGF (ndcg@10): 0.2549 (25.49%)
-UGF reduction: 0.1197 (50.9%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.88 seconds
+After optimization overall metric scores     : ndcg@10=0.3780 f1@10=0.1288
+After optimization group 1 (active) scores   : ndcg@10=0.6081 f1@10=0.2355
+After optimization group 2 (inactive) scores : ndcg@10=0.3567 f1@10=0.1189
+After optimization UGF (f1@10): 0.1165 (11.65%) | UGF (ndcg@10): 0.2514 (25.14%)
+UGF reduction: 0.1185 (50.4%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.82 seconds
-After optimization overall metric scores     : ndcg@10=0.3760 f1@10=0.1276
-After optimization group 1 (active) scores   : ndcg@10=0.5984 f1@10=0.2331
-After optimization group 2 (inactive) scores : ndcg@10=0.3554 f1@10=0.1178
-After optimization UGF (f1@10): 0.1153 (11.53%) | UGF (ndcg@10): 0.2430 (24.30%)
-UGF reduction: 0.1198 (51.0%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.88 seconds
+After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1287
+After optimization group 1 (active) scores   : ndcg@10=0.6084 f1@10=0.2361
+After optimization group 2 (inactive) scores : ndcg@10=0.3561 f1@10=0.1187
+After optimization UGF (f1@10): 0.1174 (11.74%) | UGF (ndcg@10): 0.2523 (25.23%)
+UGF reduction: 0.1176 (50.1%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
 Early stop at generation 17: first feasible solution found
-CPU time: 4.01 seconds
-After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1278
-After optimization group 1 (active) scores   : ndcg@10=0.6083 f1@10=0.2328
-After optimization group 2 (inactive) scores : ndcg@10=0.3561 f1@10=0.1180
-After optimization UGF (f1@10): 0.1147 (11.47%) | UGF (ndcg@10): 0.2522 (25.22%)
-UGF reduction: 0.1203 (51.2%)
+CPU time: 6.39 seconds
+After optimization overall metric scores     : ndcg@10=0.3784 f1@10=0.1288
+After optimization group 1 (active) scores   : ndcg@10=0.6172 f1@10=0.2364
+After optimization group 2 (inactive) scores : ndcg@10=0.3563 f1@10=0.1189
+After optimization UGF (f1@10): 0.1175 (11.75%) | UGF (ndcg@10): 0.2609 (26.09%)
+UGF reduction: 0.1175 (50.0%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.84 seconds
-After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1288
-After optimization group 1 (active) scores   : ndcg@10=0.6108 f1@10=0.2343
-After optimization group 2 (inactive) scores : ndcg@10=0.3559 f1@10=0.1190
-After optimization UGF (f1@10): 0.1153 (11.53%) | UGF (ndcg@10): 0.2549 (25.49%)
-UGF reduction: 0.1198 (50.9%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.89 seconds
+After optimization overall metric scores     : ndcg@10=0.3773 f1@10=0.1288
+After optimization group 1 (active) scores   : ndcg@10=0.5973 f1@10=0.2354
+After optimization group 2 (inactive) scores : ndcg@10=0.3569 f1@10=0.1189
+After optimization UGF (f1@10): 0.1166 (11.66%) | UGF (ndcg@10): 0.2404 (24.04%)
+UGF reduction: 0.1185 (50.4%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.85 seconds
-After optimization overall metric scores     : ndcg@10=0.3775 f1@10=0.1279
-After optimization group 1 (active) scores   : ndcg@10=0.6101 f1@10=0.2335
-After optimization group 2 (inactive) scores : ndcg@10=0.3559 f1@10=0.1181
-After optimization UGF (f1@10): 0.1154 (11.54%) | UGF (ndcg@10): 0.2542 (25.42%)
-UGF reduction: 0.1197 (50.9%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.91 seconds
+After optimization overall metric scores     : ndcg@10=0.3763 f1@10=0.1285
+After optimization group 1 (active) scores   : ndcg@10=0.5999 f1@10=0.2358
+After optimization group 2 (inactive) scores : ndcg@10=0.3556 f1@10=0.1186
+After optimization UGF (f1@10): 0.1172 (11.72%) | UGF (ndcg@10): 0.2443 (24.43%)
+UGF reduction: 0.1179 (50.2%)
 Constraint satisfied: True
 GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3145 | Cross:0.5857
-Adaptive Penalty | beta1:2.25 | beta2:2.31 | k:8
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
 Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
-Early stop at generation 16: first feasible solution found
-CPU time: 3.84 seconds
-After optimization overall metric scores     : ndcg@10=0.3765 f1@10=0.1277
-After optimization group 1 (active) scores   : ndcg@10=0.6047 f1@10=0.2344
-After optimization group 2 (inactive) scores : ndcg@10=0.3554 f1@10=0.1178
-After optimization UGF (f1@10): 0.1166 (11.66%) | UGF (ndcg@10): 0.2493 (24.93%)
-UGF reduction: 0.1184 (50.4%)
+Early stop at generation 13: first feasible solution found
+CPU time: 4.86 seconds
+After optimization overall metric scores     : ndcg@10=0.3758 f1@10=0.1287
+After optimization group 1 (active) scores   : ndcg@10=0.5941 f1@10=0.2362
+After optimization group 2 (inactive) scores : ndcg@10=0.3556 f1@10=0.1187
+After optimization UGF (f1@10): 0.1175 (11.75%) | UGF (ndcg@10): 0.2386 (23.86%)
+UGF reduction: 0.1176 (50.0%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 5.10 seconds
+After optimization overall metric scores     : ndcg@10=0.3788 f1@10=0.1293
+After optimization group 1 (active) scores   : ndcg@10=0.6057 f1@10=0.2358
+After optimization group 2 (inactive) scores : ndcg@10=0.3578 f1@10=0.1195
+After optimization UGF (f1@10): 0.1163 (11.63%) | UGF (ndcg@10): 0.2479 (24.79%)
+UGF reduction: 0.1187 (50.5%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 20: first feasible solution found
+CPU time: 7.95 seconds
+After optimization overall metric scores     : ndcg@10=0.3770 f1@10=0.1282
+After optimization group 1 (active) scores   : ndcg@10=0.5948 f1@10=0.2299
+After optimization group 2 (inactive) scores : ndcg@10=0.3568 f1@10=0.1188
+After optimization UGF (f1@10): 0.1111 (11.11%) | UGF (ndcg@10): 0.2381 (23.81%)
+UGF reduction: 0.1240 (52.7%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.88 seconds
+After optimization overall metric scores     : ndcg@10=0.3763 f1@10=0.1281
+After optimization group 1 (active) scores   : ndcg@10=0.5878 f1@10=0.2352
+After optimization group 2 (inactive) scores : ndcg@10=0.3567 f1@10=0.1181
+After optimization UGF (f1@10): 0.1170 (11.70%) | UGF (ndcg@10): 0.2311 (23.11%)
+UGF reduction: 0.1180 (50.2%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.96 seconds
+After optimization overall metric scores     : ndcg@10=0.3760 f1@10=0.1282
+After optimization group 1 (active) scores   : ndcg@10=0.5957 f1@10=0.2323
+After optimization group 2 (inactive) scores : ndcg@10=0.3556 f1@10=0.1185
+After optimization UGF (f1@10): 0.1138 (11.38%) | UGF (ndcg@10): 0.2401 (24.01%)
+UGF reduction: 0.1212 (51.6%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.87 seconds
+After optimization overall metric scores     : ndcg@10=0.3774 f1@10=0.1285
+After optimization group 1 (active) scores   : ndcg@10=0.6057 f1@10=0.2346
+After optimization group 2 (inactive) scores : ndcg@10=0.3563 f1@10=0.1187
+After optimization UGF (f1@10): 0.1159 (11.59%) | UGF (ndcg@10): 0.2494 (24.94%)
+UGF reduction: 0.1192 (50.7%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.89 seconds
+After optimization overall metric scores     : ndcg@10=0.3774 f1@10=0.1292
+After optimization group 1 (active) scores   : ndcg@10=0.5885 f1@10=0.2356
+After optimization group 2 (inactive) scores : ndcg@10=0.3579 f1@10=0.1194
+After optimization UGF (f1@10): 0.1162 (11.62%) | UGF (ndcg@10): 0.2306 (23.06%)
+UGF reduction: 0.1188 (50.6%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.88 seconds
+After optimization overall metric scores     : ndcg@10=0.3749 f1@10=0.1275
+After optimization group 1 (active) scores   : ndcg@10=0.5959 f1@10=0.2331
+After optimization group 2 (inactive) scores : ndcg@10=0.3544 f1@10=0.1177
+After optimization UGF (f1@10): 0.1154 (11.54%) | UGF (ndcg@10): 0.2415 (24.15%)
+UGF reduction: 0.1196 (50.9%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.87 seconds
+After optimization overall metric scores     : ndcg@10=0.3765 f1@10=0.1286
+After optimization group 1 (active) scores   : ndcg@10=0.5867 f1@10=0.2308
+After optimization group 2 (inactive) scores : ndcg@10=0.3570 f1@10=0.1191
+After optimization UGF (f1@10): 0.1117 (11.17%) | UGF (ndcg@10): 0.2297 (22.97%)
+UGF reduction: 0.1233 (52.5%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.87 seconds
+After optimization overall metric scores     : ndcg@10=0.3766 f1@10=0.1288
+After optimization group 1 (active) scores   : ndcg@10=0.5917 f1@10=0.2346
+After optimization group 2 (inactive) scores : ndcg@10=0.3567 f1@10=0.1190
+After optimization UGF (f1@10): 0.1155 (11.55%) | UGF (ndcg@10): 0.2350 (23.50%)
+UGF reduction: 0.1195 (50.8%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.89 seconds
+After optimization overall metric scores     : ndcg@10=0.3758 f1@10=0.1295
+After optimization group 1 (active) scores   : ndcg@10=0.5885 f1@10=0.2370
+After optimization group 2 (inactive) scores : ndcg@10=0.3561 f1@10=0.1195
+After optimization UGF (f1@10): 0.1175 (11.75%) | UGF (ndcg@10): 0.2324 (23.24%)
+UGF reduction: 0.1175 (50.0%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.95 seconds
+After optimization overall metric scores     : ndcg@10=0.3772 f1@10=0.1284
+After optimization group 1 (active) scores   : ndcg@10=0.5990 f1@10=0.2352
+After optimization group 2 (inactive) scores : ndcg@10=0.3566 f1@10=0.1185
+After optimization UGF (f1@10): 0.1167 (11.67%) | UGF (ndcg@10): 0.2424 (24.24%)
+UGF reduction: 0.1183 (50.3%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.89 seconds
+After optimization overall metric scores     : ndcg@10=0.3759 f1@10=0.1286
+After optimization group 1 (active) scores   : ndcg@10=0.5856 f1@10=0.2356
+After optimization group 2 (inactive) scores : ndcg@10=0.3564 f1@10=0.1187
+After optimization UGF (f1@10): 0.1169 (11.69%) | UGF (ndcg@10): 0.2292 (22.92%)
+UGF reduction: 0.1182 (50.3%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.95 seconds
+After optimization overall metric scores     : ndcg@10=0.3780 f1@10=0.1293
+After optimization group 1 (active) scores   : ndcg@10=0.6004 f1@10=0.2368
+After optimization group 2 (inactive) scores : ndcg@10=0.3574 f1@10=0.1194
+After optimization UGF (f1@10): 0.1174 (11.74%) | UGF (ndcg@10): 0.2431 (24.31%)
+UGF reduction: 0.1176 (50.0%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.92 seconds
+After optimization overall metric scores     : ndcg@10=0.3769 f1@10=0.1287
+After optimization group 1 (active) scores   : ndcg@10=0.5972 f1@10=0.2351
+After optimization group 2 (inactive) scores : ndcg@10=0.3564 f1@10=0.1188
+After optimization UGF (f1@10): 0.1163 (11.63%) | UGF (ndcg@10): 0.2408 (24.08%)
+UGF reduction: 0.1188 (50.5%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 20: first feasible solution found
+CPU time: 7.57 seconds
+After optimization overall metric scores     : ndcg@10=0.3744 f1@10=0.1267
+After optimization group 1 (active) scores   : ndcg@10=0.5836 f1@10=0.2267
+After optimization group 2 (inactive) scores : ndcg@10=0.3550 f1@10=0.1175
+After optimization UGF (f1@10): 0.1092 (10.92%) | UGF (ndcg@10): 0.2286 (22.86%)
+UGF reduction: 0.1258 (53.5%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 17: first feasible solution found
+CPU time: 6.38 seconds
+After optimization overall metric scores     : ndcg@10=0.3790 f1@10=0.1293
+After optimization group 1 (active) scores   : ndcg@10=0.6021 f1@10=0.2362
+After optimization group 2 (inactive) scores : ndcg@10=0.3583 f1@10=0.1194
+After optimization UGF (f1@10): 0.1168 (11.68%) | UGF (ndcg@10): 0.2438 (24.38%)
+UGF reduction: 0.1183 (50.3%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 20: first feasible solution found
+CPU time: 7.49 seconds
+After optimization overall metric scores     : ndcg@10=0.3762 f1@10=0.1269
+After optimization group 1 (active) scores   : ndcg@10=0.6044 f1@10=0.2288
+After optimization group 2 (inactive) scores : ndcg@10=0.3551 f1@10=0.1175
+After optimization UGF (f1@10): 0.1113 (11.13%) | UGF (ndcg@10): 0.2493 (24.93%)
+UGF reduction: 0.1237 (52.6%)
+Constraint satisfied: True
+GA Optimizer | Model:NCF | Dataset:dataset\5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
+Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
+Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
+Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
+Epsilon: 0.1175
+Early stop at generation 13: first feasible solution found
+CPU time: 4.90 seconds
+After optimization overall metric scores     : ndcg@10=0.3768 f1@10=0.1286
+After optimization group 1 (active) scores   : ndcg@10=0.5868 f1@10=0.2357
+After optimization group 2 (inactive) scores : ndcg@10=0.3573 f1@10=0.1187
+After optimization UGF (f1@10): 0.1170 (11.70%) | UGF (ndcg@10): 0.2295 (22.95%)
+UGF reduction: 0.1181 (50.2%)
 Constraint satisfied: True

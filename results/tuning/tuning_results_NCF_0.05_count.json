@@ -1,26 +1,26 @@
 {
   "best_params": {
     "population_size": 10,
-    "mutation_rate": 0.3145026097866015,
-    "crossover_rate": 0.585668037562274,
-    "elitism_count": 7,
-    "penalty_beta1": 2.250406579338134,
-    "penalty_beta2": 2.3054685667135266,
-    "penalty_history_k": 8
+    "mutation_rate": 0.35042835073512607,
+    "crossover_rate": 0.7261631564388042,
+    "elitism_count": 5,
+    "penalty_beta1": 2.4273988302197966,
+    "penalty_beta2": 1.8822923328055867,
+    "penalty_history_k": 6
   },
-  "best_score": 0.06658869929055825,
-  "best_trial_number": 13,
+  "best_score": 0.0742009323849431,
+  "best_trial_number": 16,
   "best_trial_user_attrs": {
-    "best_fitness": 452621.46875,
-    "final_f1": 0.10763068656146138,
-    "final_ugf": 0.10695888102054596,
-    "cpu_time": 14.017563199973665,
+    "best_fitness": 467674.25,
+    "final_f1": 0.10639723200939324,
+    "final_ugf": 0.10593143057244467,
+    "cpu_time": 12.476919600041583,
     "constraint_satisfied": true,
-    "speed_score": 0.06658869929055825
+    "speed_score": 0.0742009323849431
   },
   "n_trials": 50,
   "n_feasible_trials": 50,
-  "elapsed_time": 3209.5089109999826,
+  "elapsed_time": 3029.6147980000824,
   "study_name": "ga_tuning_NCF_0.05_count",
   "model_name": "NCF",
   "group_name": "0.05_count"
