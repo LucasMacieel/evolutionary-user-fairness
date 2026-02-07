@@ -15,19 +15,7 @@ This implementation extends the original work with:
 - **Hyperparameter Tuning** (`ga_hyperparameter_tuning.py`): Optuna-based TPE optimization
 - **Statistical Evaluation** (`ga_statistical_evaluation.py`): Multi-run statistical analysis (30 runs by default)
 
-## Project Status
-
-### ✅ Completed Components
-
-| Component | Status | Description |
-|-----------|--------|-------------|
-| MILP Solver | ✅ Complete | PuLP-based solver with HiGHS/CBC backends, warm start support |
-| GA Optimizer | ✅ Complete | Vectorized NumPy implementation, adaptive penalty (Bean & Hadj-Alouane), Deb's feasibility rules |
-| Hyperparameter Tuning | ✅ Complete | Optuna TPE optimization with pruning and caching |
-| Statistical Evaluation | ✅ Complete | 30-run analysis with 95% CI, IQR, and convergence tracking |
-| Visualization | ✅ Complete | Convergence plots, solver comparison, statistical summaries |
-
-### 📊 Experimental Results
+## 📊 Experimental Results
 
 Results are available for the following configurations:
 
@@ -42,7 +30,7 @@ Statistical evaluation results include:
 - Inter-quartile range (IQR)
 - Success rate metrics
 
-### 🔧 Key GA Features
+## 🔧 Key GA Features
 
 - **Warm-Start Initialization**: Greedy baseline (top-K by score) for all individuals
 - **Smart Swap Mutation**: Fairness-aware repair bias
@@ -62,11 +50,28 @@ Statistical evaluation results include:
 
 ## Requirements
 
-Python 3.8+
+### Install uv
+
+**Linux/macOS (curl):**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Linux/macOS (wget):**
+```bash
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+### Python 3.14+
 
 Install dependencies:
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 Dependencies:
@@ -181,7 +186,8 @@ user-fairness/
 │   ├── cache/                 # Vectorized data cache
 │   └── utils/
 │       └── tools.py           # Helper functions
-├── requirements.txt
+├── pyproject.toml            # Project configuration and dependencies
+├── uv.lock                    # Locked dependencies
 └── README.md
 ```
 

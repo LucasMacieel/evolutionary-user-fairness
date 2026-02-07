@@ -1,1 +1,11 @@
-__pycache__
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# uv/Environment
+.venv/
+
+# Distribution / Packaging
+dist/
+build/
