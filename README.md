@@ -109,7 +109,7 @@ Run the Mixed Integer Linear Programming solver:
 
 ```bash
 cd src/
-python model.py
+uv run model.py
 ```
 
 Configure in `model.py`:
@@ -123,7 +123,7 @@ Run the GA optimizer:
 
 ```bash
 cd src/
-python ga_optimizer.py
+uv run ga_optimizer.py
 ```
 
 Key parameters:
@@ -138,7 +138,7 @@ Run automated hyperparameter optimization using Optuna:
 
 ```bash
 cd src/
-python ga_hyperparameter_tuning.py --dataset 5Beauty-rand --model biasedMF --group count --n-trials 50
+uv run ga_hyperparameter_tuning.py --dataset 5Beauty-rand --model biasedMF --group count --n-trials 50
 ```
 
 Options:
