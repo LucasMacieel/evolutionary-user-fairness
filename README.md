@@ -32,7 +32,7 @@ This implementation extends the original work with:
 Results are available for the following configurations:
 
 - **Models**: NCF, biasedMF
-- **Datasets**: 5Beauty-rand (Amazon)
+- **Datasets**: 5Beauty-rand, 5Grocery-rand, 5Health-rand (Amazon)
 - **Groupings**: count, max_price, sum_price
 - **Solvers**: HiGHS, CBC (MILP) + GA
 
@@ -44,7 +44,7 @@ Statistical evaluation results include:
 
 ### 🔧 Key GA Features
 
-- **Perturbed Greedy Initialization**: High-quality starting population
+- **Warm-Start Initialization**: Greedy baseline (top-K by score) for all individuals
 - **Smart Swap Mutation**: Fairness-aware repair bias
 - **Tournament Selection**: Deb's feasibility rules for constraint handling
 - **Adaptive Penalty**: Dynamic penalty coefficient based on feasibility history
@@ -162,9 +162,9 @@ Results include mean, std, median, 95% CI, IQR, and success rate for all metrics
 ## Results
 
 Results are saved in `./results/` with subdirectories:
-- `highs/`, `cbc/`: MILP solver outputs
+- `NCF/`, `biasedMF/`: Model-specific results (contains `cbc/`, `highs/`, `ga/` subfolders)
 - `tuning/`: Hyperparameter tuning results
-- `statistical/`: GA Statistical evaluation results
+- `statistical/`: GA statistical evaluation results
 
 ## Project Structure
 
@@ -173,7 +173,7 @@ user-fairness/
 ├── dataset/                    # Processed datasets
 ├── results/                    # Output results
 ├── src/
-│   ├── model.py               # MILP solver (PuLP/HiGHS/SCIP)
+│   ├── model.py               # MILP solver (PuLP with HiGHS/CBC backends)
 │   ├── ga_optimizer.py        # Genetic Algorithm optimizer
 │   ├── ga_hyperparameter_tuning.py  # Optuna hyperparameter tuning
 │   ├── ga_statistical_evaluation.py # Statistical evaluation module
