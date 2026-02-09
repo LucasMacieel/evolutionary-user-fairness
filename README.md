@@ -154,7 +154,7 @@ Run multiple GA iterations for statistical analysis:
 
 ```bash
 cd src/
-python ga_statistical_evaluation.py --n-runs 30
+uv run ga_statistical_evaluation.py --n-runs 30
 ```
 
 Options:
