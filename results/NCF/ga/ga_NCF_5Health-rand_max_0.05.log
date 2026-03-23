@@ -1,0 +1,16 @@
+GA Optimizer | Model:NCF | Dataset:5Health-rand | Group:max_0.05 | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.3355 f1@10=0.1220
+Before optimization group 1 (active) scores  : ndcg@10=0.4651 f1@10=0.2112
+Before optimization group 2 (inactive) scores: ndcg@10=0.3274 f1@10=0.1165
+Before optimization UGF (f1@10): 0.0948 (9.48%) | UGF (ndcg@10): 0.1377 (13.77%)
+Epsilon: 0.0474
+Early stop at generation 10: first feasible solution found
+CPU time: 10.36 seconds
+After optimization overall metric scores     : ndcg@10=0.3267 f1@10=0.1136
+After optimization group 1 (active) scores   : ndcg@10=0.3895 f1@10=0.1577
+After optimization group 2 (inactive) scores : ndcg@10=0.3228 f1@10=0.1108
+After optimization UGF (f1@10): 0.0469 (4.69%) | UGF (ndcg@10): 0.0667 (6.67%)
+UGF reduction: 0.0479 (50.6%)
+Constraint satisfied: True

@@ -9,3 +9,6 @@ __pycache__/
 # Distribution / Packaging
 dist/
 build/
+
+# Cache
+src/cache

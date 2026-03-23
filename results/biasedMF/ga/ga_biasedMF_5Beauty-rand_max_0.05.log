@@ -1,0 +1,16 @@
+GA Optimizer | Model:biasedMF | Dataset:5Beauty-rand | Group:max_0.05 | K=10 | Fairness_metric=f1
+GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
+Before optimization overall scores           : ndcg@10=0.4325 f1@10=0.1427
+Before optimization group 1 (active) scores  : ndcg@10=0.5359 f1@10=0.2131
+Before optimization group 2 (inactive) scores: ndcg@10=0.4263 f1@10=0.1386
+Before optimization UGF (f1@10): 0.0745 (7.45%) | UGF (ndcg@10): 0.1096 (10.96%)
+Epsilon: 0.0373
+Early stop at generation 8: first feasible solution found
+CPU time: 4.92 seconds
+After optimization overall metric scores     : ndcg@10=0.4273 f1@10=0.1378
+After optimization group 1 (active) scores   : ndcg@10=0.4780 f1@10=0.1725
+After optimization group 2 (inactive) scores : ndcg@10=0.4243 f1@10=0.1357
+After optimization UGF (f1@10): 0.0368 (3.68%) | UGF (ndcg@10): 0.0537 (5.37%)
+UGF reduction: 0.0377 (50.6%)
+Constraint satisfied: True
