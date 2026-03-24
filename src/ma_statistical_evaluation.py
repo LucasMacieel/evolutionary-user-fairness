@@ -1,7 +1,7 @@
 """
-GA Statistical Evaluation Module
+MA Statistical Evaluation Module
 
-Runs the Genetic Algorithm across all datasets, models, and groupings
+Runs the Memetic Algorithm across all datasets, models, and groupings
 for multiple iterations (default: 30) WITHOUT a fixed random seed to
 ensure statistical rigor of results.
 
@@ -14,8 +14,8 @@ Collects key metrics from each run and computes statistical summaries:
 - Success Rate (constraint satisfaction)
 
 Usage:
-    python ga_statistical_evaluation.py --runs 30 --output ../results/statistical
-    python ga_statistical_evaluation.py --runs 5 --dataset 5Beauty-rand --model biasedMF
+    python ma_statistical_evaluation.py --runs 30 --output ../results/statistical
+    python ma_statistical_evaluation.py --runs 5 --dataset 5Beauty-rand --model biasedMF
 """
 
 import argparse
@@ -30,11 +30,11 @@ import numpy as np
 import pandas as pd
 
 from data_loader import DataLoader
-from ga_optimizer import GAOptimizer
+from ma_optimizer import MAOptimizer
 from utils.tools import create_logger
 
 
-class GAStatisticalEvaluator:
+class MAStatisticalEvaluator:
     """
     Runs GA multiple times per configuration and computes statistical summaries.
     """
@@ -49,7 +49,7 @@ class GAStatisticalEvaluator:
         dataset_folder: str = "../dataset",
         k: int = 10,
         verbose: bool = True,
-        # GA parameters (matching latest ga_optimizer.py defaults)
+        # MA parameters (matching latest ma_optimizer.py defaults)
         population_size: int = 10,
         generations: int = 1000,
         mutation_rate: float = 0.3504,
@@ -72,7 +72,7 @@ class GAStatisticalEvaluator:
             dataset_folder: Path to dataset folder
             k: Top-K for recommendations
             verbose: Print progress to console
-            population_size: GA population size
+            population_size: MA population size
             generations: Number of GA generations
             mutation_rate: Mutation rate for GA
             crossover_rate: Crossover rate for GA
@@ -87,7 +87,7 @@ class GAStatisticalEvaluator:
         self.k = k
         self.verbose = verbose
 
-        # GA parameters
+        # MA parameters
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
@@ -97,7 +97,7 @@ class GAStatisticalEvaluator:
         self.penalty_beta2 = penalty_beta2
         self.penalty_history_k = penalty_history_k
 
-        # Default configurations (matching ga_optimizer.py main block)
+        # Default configurations (matching ma_optimizer.py main block)
         self.datasets = datasets or ["5Beauty-rand", "5Grocery-rand", "5Health-rand"]
         self.models = models or ["biasedMF", "NCF"]
         self.groupings = groupings or [
@@ -137,7 +137,7 @@ class GAStatisticalEvaluator:
         prebuilt_data: Dict = None,
     ) -> Dict:
         """
-        Execute a single GA run without setting a random seed.
+        Execute a single MA run without setting a random seed.
 
         Args:
             data_loader: DataLoader instance
@@ -150,8 +150,8 @@ class GAStatisticalEvaluator:
         Returns:
             Dictionary with run results
         """
-        # Create GA optimizer WITHOUT seed (seed=None allows natural randomness)
-        ga = GAOptimizer(
+        # Create MA optimizer WITHOUT seed (seed=None allows natural randomness)
+        ma = MAOptimizer(
             data_loader=data_loader,
             k=self.k,
             eval_metric_list=self.metrics_list,
@@ -161,7 +161,7 @@ class GAStatisticalEvaluator:
             group_name=group_name,
             seed=None,  # No seed for statistical rigor
             prebuilt_data=prebuilt_data,
-            # GA parameters from evaluator config
+            # MA parameters from evaluator config
             population_size=self.population_size,
             generations=self.generations,
             mutation_rate=self.mutation_rate,
@@ -174,7 +174,7 @@ class GAStatisticalEvaluator:
         )
 
         # Run optimization
-        results = ga.train()
+        results = ma.train()
 
         return {
             "run_id": run_id,
@@ -349,7 +349,7 @@ class GAStatisticalEvaluator:
         start_time = time.time()
 
         print("=" * 80)
-        print("GA STATISTICAL EVALUATION")
+        print("MA STATISTICAL EVALUATION")
         print("=" * 80)
         print(f"Configurations: {total_configs}")
         print(f"Runs per configuration: {self.n_runs}")
@@ -399,15 +399,15 @@ class GAStatisticalEvaluator:
 
                         if os.path.exists(cache_file):
                             print(f"  Loading cached data from: {cache_file}")
-                            prebuilt_data = GAOptimizer.load_vectorized_data(cache_file)
+                            prebuilt_data = MAOptimizer.load_vectorized_data(cache_file)
                         else:
                             print("  Building vectorized data (no cache found)...")
-                            prebuilt_data = GAOptimizer.build_vectorized_data(
+                            prebuilt_data = MAOptimizer.build_vectorized_data(
                                 dl, self.k
                             )
                             # Optionally save for future use
                             os.makedirs(cache_dir, exist_ok=True)
-                            GAOptimizer.save_vectorized_data(prebuilt_data, cache_file)
+                            MAOptimizer.save_vectorized_data(prebuilt_data, cache_file)
 
                         # Setup logger for this configuration
                         logger_dir = os.path.join(self.output_dir, "logs")
@@ -420,7 +420,7 @@ class GAStatisticalEvaluator:
                         # Store runs for this configuration
                         config_runs = []
 
-                        # Run GA n_runs times
+                        # Run MA n_runs times
                         for run_id in range(1, self.n_runs + 1):
                             current_run_total += 1
 
@@ -590,7 +590,7 @@ class GAStatisticalEvaluator:
 def main():
     """CLI entry point for statistical evaluation."""
     parser = argparse.ArgumentParser(
-        description="GA Statistical Evaluation - Run GA multiple times for statistical rigor"
+        description="MA Statistical Evaluation - Run GA multiple times for statistical rigor"
     )
     parser.add_argument(
         "--runs",
@@ -661,7 +661,7 @@ def main():
             sys.exit(1)
 
     # Create evaluator
-    evaluator = GAStatisticalEvaluator(
+    evaluator = MAStatisticalEvaluator(
         n_runs=args.runs,
         output_dir=args.output,
         datasets=datasets,

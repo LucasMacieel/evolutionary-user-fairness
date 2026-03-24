@@ -1,5 +1,5 @@
-GA Optimizer | Model:biasedMF | Dataset:5Health-rand | Group:max_0.05 | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+MA Optimizer | Model:biasedMF | Dataset:5Health-rand | Group:max_0.05 | K=10 | Fairness_metric=f1
+MA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
 Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.4137 f1@10=0.1392
 Before optimization group 1 (active) scores  : ndcg@10=0.5316 f1@10=0.2221
@@ -7,7 +7,7 @@ Before optimization group 2 (inactive) scores: ndcg@10=0.4064 f1@10=0.1341
 Before optimization UGF (f1@10): 0.0881 (8.81%) | UGF (ndcg@10): 0.1253 (12.53%)
 Epsilon: 0.0440
 Early stop at generation 9: first feasible solution found
-CPU time: 9.41 seconds
+CPU time: 9.25 seconds
 After optimization overall metric scores     : ndcg@10=0.4070 f1@10=0.1325
 After optimization group 1 (active) scores   : ndcg@10=0.4617 f1@10=0.1736
 After optimization group 2 (inactive) scores : ndcg@10=0.4035 f1@10=0.1300

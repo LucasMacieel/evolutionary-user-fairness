@@ -9,11 +9,11 @@ This repository includes the implementation for User-oriented Fairness in Recomm
 This implementation extends the original work with:
 
 - **MILP Solver** (`model.py`): Mixed Integer Linear Programming solver using PuLP with HiGHS/CBC backends
-- **Genetic Algorithm Optimizer** (`ga_optimizer.py`): Vectorized GA with:
+- **Memetic Algorithm Optimizer** (`ma_optimizer.py`): Vectorized MA with:
   - Adaptive penalty mechanism (Bean & Hadj-Alouane method)
   - Tournament selection with Deb's feasibility rules
-- **Hyperparameter Tuning** (`ga_hyperparameter_tuning.py`): Optuna-based TPE optimization
-- **Statistical Evaluation** (`ga_statistical_evaluation.py`): Multi-run statistical analysis (30 runs by default)
+- **Hyperparameter Tuning** (`ma_hyperparameter_tuning.py`): Optuna-based TPE optimization
+- **Statistical Evaluation** (`ma_statistical_evaluation.py`): Multi-run statistical analysis (30 runs by default)
 
 ## 📊 Experimental Results
 
@@ -22,7 +22,7 @@ Results are available for the following configurations:
 - **Models**: NCF, biasedMF
 - **Datasets**: 5Beauty-rand, 5Grocery-rand, 5Health-rand (Amazon)
 - **Groupings**: count, max_price, sum_price
-- **Solvers**: HiGHS, CBC (MILP) + GA
+- **Solvers**: HiGHS, CBC (MILP) + MA
 
 Statistical evaluation results include:
 - Mean, standard deviation, median
@@ -30,7 +30,7 @@ Statistical evaluation results include:
 - Inter-quartile range (IQR)
 - Success rate metrics
 
-## 🔧 Key GA Features
+## 🔧 Key MA Features
 
 - **Warm-Start Initialization**: Greedy baseline (top-K by score) for all individuals
 - **Smart Swap Mutation**: Fairness-aware repair bias
@@ -117,13 +117,13 @@ Configure in `model.py`:
 - `epsilon`: Fairness constraint threshold
 - `solver`: Choose between `"highs"` or `"cbc"`
 
-### Genetic Algorithm Optimizer
+### Memetic Algorithm Optimizer
 
-Run the GA optimizer:
+Run the MA optimizer:
 
 ```bash
 cd src/
-uv run ga_optimizer.py
+uv run ma_optimizer.py
 ```
 
 Key parameters:
@@ -138,7 +138,7 @@ Run automated hyperparameter optimization using Optuna:
 
 ```bash
 cd src/
-uv run ga_hyperparameter_tuning.py --dataset 5Beauty-rand --model biasedMF --group count --n-trials 50
+uv run ma_hyperparameter_tuning.py --dataset 5Beauty-rand --model biasedMF --group count --n-trials 50
 ```
 
 Options:
@@ -150,11 +150,11 @@ Options:
 
 ### Statistical Evaluation
 
-Run multiple GA iterations for statistical analysis:
+Run multiple MA iterations for statistical analysis:
 
 ```bash
 cd src/
-uv run ga_statistical_evaluation.py --n-runs 30
+uv run ma_statistical_evaluation.py --n-runs 30
 ```
 
 Options:
@@ -169,7 +169,7 @@ Results include mean, std, median, 95% CI, IQR, and success rate for all metrics
 Results are saved in `./results/` with subdirectories:
 - `NCF/`, `biasedMF/`: Model-specific results (contains `cbc/`, `highs/`, `ga/` subfolders)
 - `tuning/`: Hyperparameter tuning results
-- `statistical/`: GA statistical evaluation results
+- `statistical/`: MA statistical evaluation results
 
 ## Project Structure
 
@@ -179,9 +179,9 @@ user-fairness/
 ├── results/                    # Output results
 ├── src/
 │   ├── model.py               # MILP solver (PuLP with HiGHS/CBC backends)
-│   ├── ga_optimizer.py        # Genetic Algorithm optimizer
-│   ├── ga_hyperparameter_tuning.py  # Optuna hyperparameter tuning
-│   ├── ga_statistical_evaluation.py # Statistical evaluation module
+│   ├── ma_optimizer.py        # Memetic Algorithm optimizer
+│   ├── ma_hyperparameter_tuning.py  # Optuna hyperparameter tuning
+│   ├── ma_statistical_evaluation.py # Statistical evaluation module
 │   ├── data_loader.py         # Data loading utilities
 │   ├── cache/                 # Vectorized data cache
 │   └── utils/

@@ -1,5 +1,5 @@
-GA Optimizer | Model:NCF | Dataset:5Beauty-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+MA Optimizer | Model:NCF | Dataset:5Beauty-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+MA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
 Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3513 f1@10=0.1244
 Before optimization group 1 (active) scores  : ndcg@10=0.6176 f1@10=0.2910
@@ -7,7 +7,7 @@ Before optimization group 2 (inactive) scores: ndcg@10=0.3269 f1@10=0.1091
 Before optimization UGF (f1@10): 0.1819 (18.19%) | UGF (ndcg@10): 0.2906 (29.06%)
 Epsilon: 0.0909
 Early stop at generation 12: first feasible solution found
-CPU time: 7.28 seconds
+CPU time: 7.19 seconds
 After optimization overall metric scores     : ndcg@10=0.3368 f1@10=0.1102
 After optimization group 1 (active) scores   : ndcg@10=0.5115 f1@10=0.1876
 After optimization group 2 (inactive) scores : ndcg@10=0.3208 f1@10=0.1031

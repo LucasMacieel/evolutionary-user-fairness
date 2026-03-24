@@ -1,5 +1,5 @@
-GA Optimizer | Model:NCF | Dataset:5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
-GA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
+MA Optimizer | Model:NCF | Dataset:5Grocery-rand | Group:0.05_count | K=10 | Fairness_metric=f1
+MA Parameters | Pop:10 | Gen:1000 | Mut:0.3504 | Cross:0.7262
 Adaptive Penalty | beta1:2.43 | beta2:1.88 | k:6
 Before optimization overall scores           : ndcg@10=0.3886 f1@10=0.1451
 Before optimization group 1 (active) scores  : ndcg@10=0.6834 f1@10=0.3602
@@ -7,7 +7,7 @@ Before optimization group 2 (inactive) scores: ndcg@10=0.3613 f1@10=0.1251
 Before optimization UGF (f1@10): 0.2350 (23.50%) | UGF (ndcg@10): 0.3221 (32.21%)
 Epsilon: 0.1175
 Early stop at generation 13: first feasible solution found
-CPU time: 5.27 seconds
+CPU time: 5.44 seconds
 After optimization overall metric scores     : ndcg@10=0.3774 f1@10=0.1288
 After optimization group 1 (active) scores   : ndcg@10=0.6035 f1@10=0.2351
 After optimization group 2 (inactive) scores : ndcg@10=0.3564 f1@10=0.1189

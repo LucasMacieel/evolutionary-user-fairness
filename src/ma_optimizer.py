@@ -1,5 +1,5 @@
 """
-Genetic Algorithm Optimizer with Penalty-Based Fitness Function
+Memetic Algorithm Optimizer with Penalty-Based Fitness Function
 for User-oriented Fairness in Recommendation.
 
 OPTIMIZED VERSION: Uses vectorized NumPy operations for 10-100x speedup.
@@ -22,9 +22,9 @@ from data_loader import DataLoader
 from utils.tools import create_logger, evaluation_methods
 
 
-class GAOptimizer:
+class MAOptimizer:
     """
-    Genetic Algorithm optimizer for fairness-aware recommendation re-ranking.
+    Memetic Algorithm optimizer for fairness-aware recommendation re-ranking.
     Uses vectorized NumPy operations for performance.
     """
 
@@ -37,7 +37,7 @@ class GAOptimizer:
         logger=None,
         model_name: str = "",
         group_name: str = "",
-        # GA parameters (optimized via Optuna hyperparameter tuning)
+        # MA parameters (optimized via Optuna hyperparameter tuning)
         population_size: int = 10,
         generations: int = 1000,
         mutation_rate: float = 0.3504,
@@ -51,7 +51,7 @@ class GAOptimizer:
         # Pre-built data for faster initialization (use build_vectorized_data())
         prebuilt_data: Dict = None,
     ):
-        """Initialize GA optimizer with vectorized data structures."""
+        """Initialize MA optimizer with vectorized data structures."""
         self.data_loader = data_loader
         self.dataset_name = data_loader.path.split("/")[-1]
         self.k = k
@@ -62,7 +62,7 @@ class GAOptimizer:
         self.model_name = model_name
         self.group_name = group_name
 
-        # GA parameters
+        # MA parameters
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
@@ -99,11 +99,11 @@ class GAOptimizer:
 
             if os.path.exists(cache_file):
                 # Load from disk cache (fast)
-                prebuilt_data = GAOptimizer.load_vectorized_data(cache_file)
+                prebuilt_data = MAOptimizer.load_vectorized_data(cache_file)
             else:
                 # Build and save to disk cache for future runs
-                prebuilt_data = GAOptimizer.build_vectorized_data(data_loader, k)
-                GAOptimizer.save_vectorized_data(prebuilt_data, cache_file)
+                prebuilt_data = MAOptimizer.build_vectorized_data(data_loader, k)
+                MAOptimizer.save_vectorized_data(prebuilt_data, cache_file)
 
             self._load_prebuilt_data(prebuilt_data)
 
@@ -802,11 +802,11 @@ class GAOptimizer:
     def train(self) -> Dict:
         """Run GA optimization with vectorized operations."""
         self.logger.info(
-            f"GA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
+            f"MA Optimizer | Model:{self.model_name} | Dataset:{self.dataset_name} | "
             f"Group:{self.group_name} | K={self.k} | Fairness_metric={self.fairness_metric}"
         )
         self.logger.info(
-            f"GA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
+            f"MA Parameters | Pop:{self.population_size} | Gen:{self.generations} | "
             f"Mut:{self.mutation_rate} | Cross:{self.crossover_rate}"
         )
         self.logger.info(
@@ -1033,10 +1033,10 @@ if __name__ == "__main__":
                         continue
 
                     # Setup logging
-                    logger_dir = os.path.join(results_base_dir, model_name, "ga")
+                    logger_dir = os.path.join(results_base_dir, model_name, "ma")
                     if not os.path.exists(logger_dir):
                         os.makedirs(logger_dir)
-                    logger_file = f"ga_{model_name}_{dataset_name}_{group_name}.log"
+                    logger_file = f"ma_{model_name}_{dataset_name}_{group_name}.log"
                     logger_path = os.path.join(logger_dir, logger_file)
 
                     # Load data
@@ -1052,8 +1052,8 @@ if __name__ == "__main__":
                         path=logger_path,
                     )
 
-                    # Run GA optimizer
-                    ga = GAOptimizer(
+                    # Run MA optimizer
+                    ma = MAOptimizer(
                         data_loader=dl,
                         k=10,
                         eval_metric_list=metrics_list,
@@ -1065,7 +1065,7 @@ if __name__ == "__main__":
                     )
 
                     # Get results
-                    results = ga.train()
+                    results = ma.train()
 
                     # Store results for summary
                     all_results.append(
@@ -1075,7 +1075,7 @@ if __name__ == "__main__":
                             ),
                             "Model": model_name,
                             "Grouping": group_name,
-                            "Epsilon": ga.epsilon,
+                            "Epsilon": ma.epsilon,
                             "Final_UGF": results["final_ugf"],
                             "CPU_Time": results["cpu_time"],
                             "Status": "Completed",
@@ -1128,5 +1128,5 @@ if __name__ == "__main__":
             f"{r['Dataset']:<12} {r['Model']:<12} {r['Grouping']:<12} {eps_str:<10} {ugf_str:<12} {time_str:<10} {r['Status']:<20}"
         )
 
-    print(f"\nIndividual logs saved to: {results_base_dir}/<model_name>/ga/")
+    print(f"\nIndividual logs saved to: {results_base_dir}/<model_name>/ma/")
     print("\nAll experiments completed!")
