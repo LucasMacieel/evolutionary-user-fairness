@@ -244,9 +244,9 @@ class MAOptimizer:
 
         # Create valid items mask for efficient constraint checking
         # valid_items_mask[u, i] = True if item i is valid for user u
-        self.valid_items_mask = np.zeros((self.n_users, self.n_items), dtype=bool)
-        for u in range(self.n_users):
-            self.valid_items_mask[u, : self.items_per_user_arr[u]] = True
+        # Vectorized: item index < items_per_user_arr broadcasts over users
+        col_indices = np.arange(self.n_items)
+        self.valid_items_mask = col_indices[np.newaxis, :] < self.items_per_user_arr[:, np.newaxis]
 
     def _calculate_fitness(
         self, population: np.ndarray, current_epsilon: float
@@ -265,25 +265,19 @@ class MAOptimizer:
         pop_size = population.shape[0]
 
         # 1. Objective: Sum of preference scores
-        # population: (pop_size, n_users, n_items)
-        # scores_matrix: (n_users, n_items)
-        objectives = (population * self.scores_matrix).sum(axis=(1, 2))  # (pop_size,)
+        # population: (pop_size, n_users, n_items), scores_matrix: (n_users, n_items)
+        # einsum avoids materialising the full (pop_size, n_users, n_items) intermediate
+        objectives = np.einsum("pui,ui->p", population, self.scores_matrix)  # (pop_size,)
 
         # 2. Constraint: Fairness (UGF <= epsilon)
 
-        # Calculate selected labels per user per individual
-        selected_labels = (
-            population * self.labels_matrix
-        )  # (pop_size, n_users, n_items)
-        selected_relevant = selected_labels.sum(axis=2)  # (pop_size, n_users)
+        # Count selected relevant items per user per individual
+        # einsum fuses multiply+sum, skipping the (pop_size, n_users, n_items) intermediate
+        selected_relevant = np.einsum("pui,ui->pu", population, self.labels_matrix)  # (pop_size, n_users)
 
         # F1 metric per user: 2 * selected_relevant / (total_relevant + k)
-        # Only for users with relevant items
-        with np.errstate(divide="ignore", invalid="ignore"):
-            f1_per_user = (
-                2 * selected_relevant / self.f1_denominator
-            )  # (pop_size, n_users)
-            f1_per_user = np.nan_to_num(f1_per_user, 0)
+        # f1_denominator = total_relevant + k, and k > 0, so denominator is always > 0 — no NaN guard needed
+        f1_per_user = 2 * selected_relevant / self.f1_denominator  # (pop_size, n_users)
 
         # Mask users without relevant items
         f1_per_user[:, ~self.has_relevant] = 0
@@ -377,10 +371,9 @@ class MAOptimizer:
             parents = self._tournament_selection(population, objectives, violations, 2)
 
             # For each user, randomly pick from one parent (uniform crossover)
-            parent_choices = np.random.randint(0, 2, size=self.n_users)
-
-            for u in range(self.n_users):
-                offspring[i, u] = parents[parent_choices[u], u]
+            # Advanced indexing replaces the per-user Python loop
+            parent_choices = np.random.randint(2, size=self.n_users)  # shape (n_users,)
+            offspring[i] = parents[parent_choices, np.arange(self.n_users)]
 
         return offspring
 
@@ -418,8 +411,8 @@ class MAOptimizer:
                     n_valid = self.items_per_user_arr[u]
                     # Only consider valid items (not padding)
                     user_slice = mutated[i, u, :n_valid]
-                    selected = np.where(user_slice == 1)[0]
-                    unselected = np.where(user_slice == 0)[0]
+                    selected = np.flatnonzero(user_slice)
+                    unselected = np.flatnonzero(user_slice == 0)
 
                     if len(selected) > 0 and len(unselected) > 0:
                         # Determine strategy for this user
